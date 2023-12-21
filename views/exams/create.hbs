@@ -1,0 +1,62 @@
+<h3>Create Exam</h3>
+<div class="row">
+	<form action="/exams" method="POST" class="col s12">
+		<div class="row">
+			<div class="input-field">
+				<input type="text" id="walletAddress" name="walletAddress" />
+				<label for="title">Wallet Address</label>
+			</div>
+		</div>
+		<div class="row">
+			<div class="input-field">
+				<input type="text" id="title" name="title" />
+				<label for="title">Title</label>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="input-field">
+				<h5>Question 1:</h5>
+				<textarea id="question1" name="question1"></textarea>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="input-field">
+				<select id="answer1" name="answer1">
+					<option value="a">a</option>
+					<option value="b">b</option>
+					<option value="c">c</option>
+					<option value="d">d</option>
+
+				</select>
+				<label for="status">Answer 1</label>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="input-field">
+				<h5>Question 2:</h5>
+				<textarea id="question2" name="question2"></textarea>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="input-field">
+				<select id="answer2" name="answer2">
+					<option value="a">a</option>
+					<option value="b">b</option>
+					<option value="c">c</option>
+					<option value="d">d</option>
+
+				</select>
+				<label for="status">Answer 2</label>
+			</div>
+		</div>
+
+		<div class="row">
+			<input type="submit" value="Save" class="btn" />
+			<a href="/dashboard" class="btn orange">Cancel</a>
+		</div>
+	</form>
+</div>
