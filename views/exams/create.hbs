@@ -1,62 +1,110 @@
-<h3>Create Exam</h3>
-<div class="row">
-	<form action="/exams" method="POST" class="col s12">
-		<div class="row">
-			<div class="input-field">
-				<input type="text" id="walletAddress" name="walletAddress" />
-				<label for="title">Wallet Address</label>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Create Exam</title>
+	</head>
+	<body>
+		<h1>Create Exam</h1>
+
+		<form action="/exams" method="POST" class="col s12">
+			<label for="creator">Creator:</label>
+			<input type="text" id="creator" name="creator" required />
+
+			<label for="title">Title:</label>
+			<input type="text" id="title" name="title" required />
+
+			<h2>Questions</h2>
+
+			<div class="question">
+				<label for="questionText">Question Text:</label>
+				<input
+					type="text"
+					id="questionText"
+					name="questions[0][questionText]"
+					required
+				/>
+
+				<h3>Options</h3>
+
+				<div class="option">
+					<label for="optionText1">Option 1 Text:</label>
+					<input
+						type="text"
+						id="optionText1"
+						name="questions[0][options][0][optionText]"
+						required
+					/>
+
+					<label for="isCorrect1">Is Correct:</label>
+					<input
+						type="radio"
+						id="isCorrect1"
+						name="questions[0][options][0][isCorrect]"
+						value="true"
+						required
+					/>
+				</div>
+
+				<div class="option">
+					<label for="optionText2">Option 2 Text:</label>
+					<input
+						type="text"
+						id="optionText2"
+						name="questions[0][options][1][optionText]"
+						required
+					/>
+
+					<label for="isCorrect2">Is Correct:</label>
+					<input
+						type="radio"
+						id="isCorrect2"
+						name="questions[0][options][1][isCorrect]"
+						value="true"
+						required
+					/>
+				</div>
+
+				<div class="option">
+					<label for="optionText3">Option 3 Text:</label>
+					<input
+						type="text"
+						id="optionText3"
+						name="questions[0][options][2][optionText]"
+						required
+					/>
+
+					<label for="isCorrect3">Is Correct:</label>
+					<input
+						type="radio"
+						id="isCorrect3"
+						name="questions[0][options][2][isCorrect]"
+						value="true"
+						required
+					/>
+				</div>
+
+				<div class="option">
+					<label for="optionText4">Option 4 Text:</label>
+					<input
+						type="text"
+						id="optionText4"
+						name="questions[0][options][3][optionText]"
+						required
+					/>
+
+					<label for="isCorrect4">Is Correct:</label>
+					<input
+						type="radio"
+						id="isCorrect4"
+						name="questions[0][options][3][isCorrect]"
+						value="true"
+						required
+					/>
+				</div>
 			</div>
-		</div>
-		<div class="row">
-			<div class="input-field">
-				<input type="text" id="title" name="title" />
-				<label for="title">Title</label>
-			</div>
-		</div>
 
-		<div class="row">
-			<div class="input-field">
-				<h5>Question 1:</h5>
-				<textarea id="question1" name="question1"></textarea>
-			</div>
-		</div>
-
-		<div class="row">
-			<div class="input-field">
-				<select id="answer1" name="answer1">
-					<option value="a">a</option>
-					<option value="b">b</option>
-					<option value="c">c</option>
-					<option value="d">d</option>
-
-				</select>
-				<label for="status">Answer 1</label>
-			</div>
-		</div>
-
-		<div class="row">
-			<div class="input-field">
-				<h5>Question 2:</h5>
-				<textarea id="question2" name="question2"></textarea>
-			</div>
-		</div>
-
-		<div class="row">
-			<div class="input-field">
-				<select id="answer2" name="answer2">
-					<option value="a">a</option>
-					<option value="b">b</option>
-					<option value="c">c</option>
-					<option value="d">d</option>
-
-				</select>
-				<label for="status">Answer 2</label>
-			</div>
-		</div>
-
-		<div class="row">
-			<input type="submit" value="Save" class="btn" />
-			<a href="/dashboard" class="btn orange">Cancel</a>
-		</div>
-	</form>
-</div>
+			<button type="submit">Create Exam</button>
+		</form>
+	</body>
+</html>

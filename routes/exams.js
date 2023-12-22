@@ -8,10 +8,15 @@ router.get("/create", (req, res) => {
 
 router.post("/", async (req, res) => {
 	try {
+		req.body.questions.forEach((question) => {
+			question.options.forEach((option) => {
+				option.isCorrect = option.isCorrect || false;
+			});
+		});
 		await Exam.create(req.body);
 		res.redirect("/dashboard");
 	} catch (error) {
-		console.error(error);
+		console.log(error);
 		res.render("error/500");
 	}
 });

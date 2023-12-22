@@ -10,24 +10,28 @@ const ExamSchema = new mongoose.Schema({
 		required: true,
 		trim: true,
 	},
-	question1: {
-		type: String,
-		required: true,
-		trim: true,
-	},
-	anwer1: {
-		type: String,
-		enum: ["a", "b", "c", "d"],
-	},
-	question2: {
-		type: String,
-		required: true,
-		trim: true,
-	},
-	anwer2: {
-		type: String,
-		enum: ["a", "b", "c", "d"],
-	},
+	questions: [
+		{
+			questionText: {
+				type: String,
+				required: true,
+				trim: true,
+			},
+			options: [
+				{
+					optionText: {
+						type: String,
+						required: true,
+						trim: true,
+					},
+					isCorrect: {
+						type: Boolean,
+						required: true,
+					},
+				},
+			],
+		},
+	],
 });
 
 module.exports = mongoose.model("Exam", ExamSchema);
