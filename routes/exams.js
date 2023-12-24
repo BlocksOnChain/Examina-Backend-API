@@ -16,4 +16,17 @@ router.post("/", async (req, res) => {
 	}
 });
 
+router.get("/", async (req, res) => {
+	try {
+		const exams = await Exam.find();
+		// res.render("exams/index", {
+		// 	exams,
+		// });
+		res.json(exams);
+	} catch (err) {
+		console.error(err);
+		res.render("error/500");
+	}
+});
+
 module.exports = router;

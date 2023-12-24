@@ -6,16 +6,12 @@
 	</head>
 	<body>
 		<h1>Create Exam</h1>
-
 		<form action="/exams" method="POST" class="col s12">
 			<label for="creator">Creator:</label>
 			<input type="text" id="creator" name="creator" required />
-
 			<label for="title">Title:</label>
 			<input type="text" id="title" name="title" required />
-
 			<h2>Questions</h2>
-
 			<div class="question">
 				<label for="questionText">Question Text:</label>
 				<input
@@ -24,9 +20,7 @@
 					name="questions[0][questionText]"
 					required
 				/>
-
 				<h3>Options</h3>
-
 				<div class="option">
 					<label for="optionText1">Option 1 Text:</label>
 					<input
@@ -35,17 +29,7 @@
 						name="questions[0][options][0][optionText]"
 						required
 					/>
-
-					<label for="isCorrect1">Is Correct:</label>
-					<input
-						type="radio"
-						id="isCorrect1"
-						name="questions[0][options][0][isCorrect]"
-						value="true"
-						required
-					/>
 				</div>
-
 				<div class="option">
 					<label for="optionText2">Option 2 Text:</label>
 					<input
@@ -54,17 +38,7 @@
 						name="questions[0][options][1][optionText]"
 						required
 					/>
-
-					<label for="isCorrect2">Is Correct:</label>
-					<input
-						type="radio"
-						id="isCorrect2"
-						name="questions[0][options][1][isCorrect]"
-						value="true"
-						required
-					/>
 				</div>
-
 				<div class="option">
 					<label for="optionText3">Option 3 Text:</label>
 					<input
@@ -73,17 +47,7 @@
 						name="questions[0][options][2][optionText]"
 						required
 					/>
-
-					<label for="isCorrect3">Is Correct:</label>
-					<input
-						type="radio"
-						id="isCorrect3"
-						name="questions[0][options][2][isCorrect]"
-						value="true"
-						required
-					/>
 				</div>
-
 				<div class="option">
 					<label for="optionText4">Option 4 Text:</label>
 					<input
@@ -92,18 +56,8 @@
 						name="questions[0][options][3][optionText]"
 						required
 					/>
-
-					<label for="isCorrect4">Is Correct:</label>
-					<input
-						type="radio"
-						id="isCorrect4"
-						name="questions[0][options][3][isCorrect]"
-						value="true"
-						required
-					/>
 				</div>
 			</div>
-
 			<button type="submit">Create Exam</button>
 		</form>
 	</body>
