@@ -24,10 +24,6 @@ const ExamSchema = new mongoose.Schema({
 						required: true,
 						trim: true,
 					},
-					isCorrect: {
-						type: Boolean,
-						required: true,
-					},
 				},
 			],
 		},
