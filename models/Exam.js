@@ -1,5 +1,12 @@
 const mongoose = require("mongoose");
 
+const AnswerSchema = new mongoose.Schema({
+	answerHash: {
+		type: String,
+		required: true,
+	},
+});
+
 const ExamSchema = new mongoose.Schema({
 	creator: {
 		type: String,
@@ -28,6 +35,12 @@ const ExamSchema = new mongoose.Schema({
 			],
 		},
 	],
+	userAnswers: [AnswerSchema],
+	rootHash: {
+		type: String,
+		required: true,
+	},
 });
 
 module.exports = mongoose.model("Exam", ExamSchema);
+module.exports = mongoose.model("Answer", AnswerSchema);
