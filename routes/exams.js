@@ -1,5 +1,6 @@
 const express = require("express");
 const Exam = require("../models/Exam");
+const Answer = require("../models/Exam");
 const router = express.Router();
 const { MerkleTree } = require("merkletreejs");
 const crypto = require("crypto");
@@ -15,13 +16,41 @@ const sampleExamData = {
 		{
 			questionText: "Byzantine",
 			options: [
+				{ optionText: "Nikephoros III" },
 				{ optionText: "Alexios I" },
 				{ optionText: "John II" },
 				{ optionText: "Manuel I" },
 			],
 		},
+		{
+			questionText: "Ottoman",
+			options: [
+				{ optionText: "Bayezid I" },
+				{ optionText: "Mehmed I" },
+				{ optionText: "Murad II" },
+				{ optionText: "Mehmed II" },
+			],
+		},
+		{
+			questionText: "Mongol",
+			options: [
+				{ optionText: "Hulugu" },
+				{ optionText: "Batu" },
+				{ optionText: "Kublai" },
+				{ optionText: "Berke" },
+			],
+		},
 	],
+	// userAnswers: [{ answerHash: "" }],
+	// rootHash: "",
 };
+
+function modify(req, res, next) {
+	req.body = sampleExamData;
+	next();
+}
+
+router.use(modify);
 
 router.post("/", async (req, res) => {
 	try {
