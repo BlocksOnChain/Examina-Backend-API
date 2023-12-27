@@ -6,8 +6,8 @@
 	</head>
 	<body>
 		<h1>Create Exam</h1>
-		<form action="/exams" method="POST" class="col s12">
-			{{! <label for="creator">Creator:</label>
+		<form action="/exams/create" method="POST" class="col s12">
+			<label for="creator">Creator:</label>
 			<input type="text" id="creator" name="creator" required />
 			<label for="title">Title:</label>
 			<input type="text" id="title" name="title" required />
@@ -57,7 +57,7 @@
 						required
 					/>
 				</div>
-			</div> }}
+			</div>
 			<button type="submit">Create Exam</button>
 		</form>
 	</body>

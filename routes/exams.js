@@ -41,16 +41,16 @@ const sampleExamData = {
 			],
 		},
 	],
-	// userAnswers: [{ answerHash: "" }],
-	// rootHash: "",
+	userAnswers: [""],
+	rootHash: "",
 };
 
-function modify(req, res, next) {
-	req.body = sampleExamData;
-	next();
-}
+// function modify(req, res, next) {
+// 	req.body = sampleExamData;
+// 	next();
+// }
 
-router.use(modify);
+// router.use(modify);
 
 router.post("/", async (req, res) => {
 	try {
