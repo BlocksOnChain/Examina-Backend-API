@@ -58,6 +58,52 @@
 					/>
 				</div>
 			</div>
+			<div class="question">
+				<label for="questionText">Question Text:</label>
+				<input
+					type="text"
+					id="questionText"
+					name="questions[0][questionText]"
+					required
+				/>
+				<h3>Options</h3>
+				<div class="option">
+					<label for="optionText1">Option 1 Text:</label>
+					<input
+						type="text"
+						id="optionText1"
+						name="questions[0][options][0][optionText]"
+						required
+					/>
+				</div>
+				<div class="option">
+					<label for="optionText2">Option 2 Text:</label>
+					<input
+						type="text"
+						id="optionText2"
+						name="questions[0][options][1][optionText]"
+						required
+					/>
+				</div>
+				<div class="option">
+					<label for="optionText3">Option 3 Text:</label>
+					<input
+						type="text"
+						id="optionText3"
+						name="questions[0][options][2][optionText]"
+						required
+					/>
+				</div>
+				<div class="option">
+					<label for="optionText4">Option 4 Text:</label>
+					<input
+						type="text"
+						id="optionText4"
+						name="questions[0][options][3][optionText]"
+						required
+					/>
+				</div>
+			</div>
 			<button type="submit">Create Exam</button>
 		</form>
 	</body>
