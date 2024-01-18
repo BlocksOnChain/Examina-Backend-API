@@ -45,13 +45,6 @@ const sampleExamData = {
 	rootHash: "",
 };
 
-// function modify(req, res, next) {
-// 	req.body = sampleExamData;
-// 	next();
-// }
-
-// router.use(modify);
-
 router.post("/", async (req, res) => {
 	try {
 		await Exam.create(req.body);
@@ -121,6 +114,39 @@ router.post("/:id", async (req, res) => {
 		res.redirect("/exams");
 	} catch (error) {
 		console.log(error);
+		res.render("error/500");
+	}
+});
+
+// TODO: answer objects must be reorganize as address => answer[]
+router.get("/:id/student/:address", async (req, res) => {
+	try {
+		const examId = req.params.id;
+		const address = req.params.address;
+
+		// Find the exam by ID
+		const exam = await Exam.findById(examId);
+		if (!exam) {
+			return res.status(404).render("error/404");
+		}
+
+		// Find the student's answers in the Exam document
+		const studentAnswers = exam.userAnswers.find(
+			(answer) => answer.address === address
+		);
+
+		if (!studentAnswers) {
+			return res
+				.status(404)
+				.json({
+					error: "Student's answers not found for the given exam and student ID.",
+				});
+		}
+
+		// Return the student's answers
+		res.json(studentAnswers);
+	} catch (err) {
+		console.error(err);
 		res.render("error/500");
 	}
 });
