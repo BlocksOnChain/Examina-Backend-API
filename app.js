@@ -22,6 +22,7 @@ app.set("view engine", ".hbs");
 
 app.use("/", require("./routes/index"));
 app.use("/exams", require("./routes/exams"));
+app.use("/register", require("./routes/register"));
 
 const PORT = process.env.PORT || 5000;
 
