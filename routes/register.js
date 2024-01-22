@@ -1,12 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
-// TODO: Create a User Model
 const User = require("../models/User");
 
 router.post("/register", (req, res) => {
-	const { email, password } = req.body;
-	const newUser = new User({ email });
+	const { email, password, walletAddress } = req.body;
+	const newUser = new User({ email, walletAddress });
 	User.register(newUser, password, (err, user) => {
 		if (err) {
 			console.error(err);
