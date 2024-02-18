@@ -4,6 +4,7 @@ const Answer = require("../models/Exam");
 const router = express.Router();
 const { MerkleTree } = require("merkletreejs");
 const crypto = require("crypto");
+const Classroom = require("../models/Classroom");
 
 router.get("/create", (req, res) => {
 	res.render("exams/create");
@@ -47,6 +48,24 @@ const sampleExamData = {
 
 router.post("/", async (req, res) => {
 	try {
+		// Check if the logged-in user is a teacher
+		if (req.user.role !== "teacher") {
+			return res.status(403).json({ message: "Unauthorized" });
+		}
+
+		// Check if the logged-in teacher is allowed to create the exam for the given classroom
+		const classroomId = req.body.classroomId;
+		const classroom = await Classroom.findById(classroomId);
+		if (
+			!classroom ||
+			classroom.teacher.toString() !== req.user._id.toString()
+		) {
+			return res.status(403).json({
+				message:
+					"You are not allowed to create exams for this classroom",
+			});
+		}
+
 		await Exam.create(req.body);
 		res.redirect("/dashboard");
 	} catch (error) {
@@ -136,11 +155,9 @@ router.get("/:id/student/:address", async (req, res) => {
 		);
 
 		if (!studentAnswers) {
-			return res
-				.status(404)
-				.json({
-					error: "Student's answers not found for the given exam and student ID.",
-				});
+			return res.status(404).json({
+				error: "Student's answers not found for the given exam and student ID.",
+			});
 		}
 
 		// Return the student's answers
