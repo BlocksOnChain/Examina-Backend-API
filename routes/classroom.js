@@ -44,4 +44,33 @@ router.get("/student/:studentId", async (req, res) => {
 	}
 });
 
+router.delete("/:classroomId", async (req, res) => {
+	try {
+		const classroomId = req.params.classroomId;
+		const userId = req.user.id; // Kullanıcı kimliğini al
+
+		const classroom = await Classroom.findOne({
+			_id: classroomId,
+			teacher: userId,
+		});
+
+		if (!classroom) {
+			return res.status(404).json({
+				message:
+					"Classroom not found or you are not authorized to delete it",
+			});
+		}
+
+		const deletedClassroom = await Classroom.findByIdAndRemove(classroomId);
+		if (deletedClassroom) {
+			res.json({ message: "Classroom deleted successfully" });
+		} else {
+			res.status(404).json({ message: "Classroom not found" });
+		}
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ message: "Internal Server Error" });
+	}
+});
+
 module.exports = router;
