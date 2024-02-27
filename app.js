@@ -3,12 +3,16 @@ const dotenv = require("dotenv");
 const morgan = require("morgan");
 const exphbs = require("express-handlebars");
 const connectDB = require("./config/db");
-
+const compression = require("compression");
 dotenv.config({ path: "./config/config.env" });
 
 connectDB();
 
 const app = express();
+
+app.use(compression());
+
+app.use(express.static(path.join(__dirname, "public")));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
