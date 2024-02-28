@@ -66,10 +66,9 @@ router.post("/", (req, res) => {
 				});
 			} else {
 				req.session.user = user;
-				return res.json({ success: true, user: req.session.user, token: req.session.token });
+				return res.json({ success: true, user: req.session.user });
 			}
 		});
-	res.json({success: true, token });
 	} else {
 		res.status(401).json({ error: "Invalid signature or didn't have session token" });
 	}
