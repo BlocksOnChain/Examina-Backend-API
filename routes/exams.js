@@ -5,8 +5,9 @@ const router = express.Router();
 const { MerkleTree } = require("merkletreejs");
 const crypto = require("crypto");
 const Classroom = require("../models/Classroom");
+const { isAuthenticated } = require("../middleware/auth");
 
-router.get("/create", (req, res) => {
+router.get("/create", isAuthenticated ,(req, res) => {
 	res.render("exams/create");
 });
 
