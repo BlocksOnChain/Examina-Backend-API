@@ -4,6 +4,7 @@ const Answer = require("../models/Exam");
 const router = express.Router();
 const { MerkleTree } = require("merkletreejs");
 const crypto = require("crypto");
+const Classroom = require("../models/Classroom");
 
 router.get("/create", (req, res) => {
 	res.render("exams/create");
@@ -47,6 +48,24 @@ const sampleExamData = {
 
 router.post("/", async (req, res) => {
 	try {
+		// Check if the logged-in user is a teacher
+		if (req.user.role !== "teacher") {
+			return res.status(403).json({ message: "Unauthorized" });
+		}
+
+		// Check if the logged-in teacher is allowed to create the exam for the given classroom
+		const classroomId = req.body.classroomId;
+		const classroom = await Classroom.findById(classroomId);
+		if (
+			!classroom ||
+			classroom.teacher.toString() !== req.user._id.toString()
+		) {
+			return res.status(403).json({
+				message:
+					"You are not allowed to create exams for this classroom",
+			});
+		}
+
 		await Exam.create(req.body);
 		res.redirect("/dashboard");
 	} catch (error) {
@@ -78,6 +97,7 @@ router.get("/:id", async (req, res) => {
 	}
 });
 
+// create an answer and push it to the exam
 router.post("/:id", async (req, res) => {
 	try {
 		const hashInput = req.body.address + JSON.stringify(req.body.answers);
@@ -117,38 +137,58 @@ router.post("/:id", async (req, res) => {
 		res.render("error/500");
 	}
 });
-
-// TODO: answer objects must be reorganize as address => answer[]
-router.get("/:id/student/:address", async (req, res) => {
+router.delete("/:id", async (req, res) => {
 	try {
 		const examId = req.params.id;
-		const address = req.params.address;
+		const userId = req.user._id;
 
-		// Find the exam by ID
-		const exam = await Exam.findById(examId);
+		// Find the exam by ID and check if the logged-in teacher created it
+		const exam = await Exam.findOne({ _id: examId, creator: userId });
 		if (!exam) {
-			return res.status(404).render("error/404");
+			return res.status(404).json({
+				message:
+					"Exam not found or you are not authorized to delete it",
+			});
 		}
 
-		// Find the student's answers in the Exam document
-		const studentAnswers = exam.userAnswers.find(
-			(answer) => answer.address === address
-		);
-
-		if (!studentAnswers) {
-			return res
-				.status(404)
-				.json({
-					error: "Student's answers not found for the given exam and student ID.",
-				});
-		}
-
-		// Return the student's answers
-		res.json(studentAnswers);
-	} catch (err) {
-		console.error(err);
-		res.render("error/500");
+		// Delete the exam
+		await Exam.findByIdAndDelete(examId);
+		res.json({ message: "Exam deleted successfully" });
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ message: "Internal Server Error" });
 	}
 });
+
+// TODO: answer objects must be reorganize as address => answer[]
+// router.get("/:id/student/:address", async (req, res) => {
+// 	try {
+// 		const examId = req.params.id;
+// 		const address = req.params.address;
+
+// 		// Find the exam by ID
+// 		const exam = await Exam.findById(examId);
+// 		if (!exam) {
+// 			return res.status(404).render("error/404");
+// 		}
+
+// 		// Find the student's answers in the Exam document
+// 		const studentAnswers = exam.userAnswers.find(
+// 			(answer) => answer.address === address
+// 		);
+
+// 		if (!studentAnswers) {
+// 			return res.status(404).json({
+// 				error: "Student's answers not found for the given exam and student ID.",
+// 			});
+// 		}
+
+// 		// Return the student's answers
+// 		res.json(studentAnswers);
+// 	} catch (err) {
+// 		console.error(err);
+// 		res.render("error/500");
+// 	}
+// });
 
 module.exports = router;
