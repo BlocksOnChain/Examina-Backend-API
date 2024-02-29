@@ -22,6 +22,7 @@ const userAnswerSchema = new mongoose.Schema({
             ref: 'Option',
         },
     }],
-});
+},   autoCreate=  true,
+);
 
 module.exports = mongoose.model("Answer", userAnswerSchema);

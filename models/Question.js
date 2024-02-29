@@ -15,6 +15,6 @@ const QuestionSchema = new mongoose.Schema({
             required: true,
         },
     }],
-});
+}, autoCreate=  true);
 
 module.exports = mongoose.model("Question", QuestionSchema);

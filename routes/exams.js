@@ -80,7 +80,7 @@ router.post("/", async (req, res) => {
 
 router.post("/create", async (req, res) => {
 	try {
-		await Exam.create(creator = req.session.user, title = req.body.title, questions = req.body.questions, rootHash = req.body.rootHash, contract_address = req.body.contract_address);
+		await Exam.create(creator = req.session.user_id, title = req.body.title, questions = req.body.questions, rootHash = req.body.rootHash, contract_address = req.body.contract_address);
 		res.status(200).json({ message: "Exam created successfully" });
 	} catch (err) {
 		res.status(500).json({ message: err });

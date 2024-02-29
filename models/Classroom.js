@@ -15,6 +15,6 @@ const ClassroomSchema = new mongoose.Schema({
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "User",
 	},
-});
+}, autoCreate=  true);
 
 module.exports = mongoose.model("Classroom", ClassroomSchema);

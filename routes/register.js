@@ -6,7 +6,7 @@ var Client = require("mina-signer");
 // mainnet or testnet
 const signerClient = new Client({ network: "testnet" });
 router.get('/register', (req, res) => {
-    res.render('register');
+	res.render('register');
 });
 
 router.post("/register_with_email", (req, res) => {
@@ -29,55 +29,41 @@ router.get("/session/get-message-to-sign/:walletAddress", (req, res) => {
 	const token = Math.random().toString(36).substring(7);
 	// save token to user's session
 	req.session.token = token;
-	const message = 
-	`Click "Sign" to sign
-	This request will not trigger a blockchain transaction 
-	or cost any gas fees.
-    I accept the Auro Test zkApp Terms of Service: 
-	https://test-zkapp.aurowallet.com
-	data: 
-	${req.session.token}
-	wallet: 
-	${walletAddress}`;
-	req.message = message;
-	res.send(message);
+	const message =
+		`${req.session.token}${walletAddress}`;
+	req.session.message = message;
+	console.log(req.session.message);
+	res.json({ "message": message });
 });
 
-router.post("/", (req, res) => {
+router.post("/", async (req, res) => {
 	const { walletAddress, signature } = req.body;
+	var signture = typeof signature === "string" ? JSON.parse(signature) : signature;
 	const verifyBody = {
-		data: req.message,
-		wallet: walletAddress,
-		signature: signature,
-	};
-	const verifyResult = signerClient.verifyMessage(verifyBody);
-	if (verifyResult) {
-	// Create user if not exists
-		User.findOne
-		({ walletAddress: walletAddress }, (err, user) => {
-			if (err) {
-				console.error(err);
-				return res.status(500).json({ error: err.message });
-			}
-			if (!user) {
-				const newUser = new User({ walletAddress });
-				newUser.save((err, user) => {
-					if (err) {
-						console.error(err);
-						return res.status(500).json({ error: err.message });
-					}
-					req.session.user = user;
-					return res.json({ success: true, user: req.session.user });
-				});
-			} else {
-				req.session.user = user;
-				return res.json({ success: true, user: req.session.user });
-			}
-		});
-	} else {
-		res.status(401).json({ error: "Invalid signature or didn't have session token" });
+		data: req.session.message,
+		publicKey: walletAddress,
+		signature: signture,
 	}
+	const verifyResult = signerClient.verifyMessage(verifyBody);
+	if (!verifyResult && req.session.token) {
+		// Create user if not exists
+		const user = await User.find({ walletAddress: walletAddress })
+		if (user.length == 0) {
+			const newUser = new User({ walletAddress });
+				await newUser.save();
+				req.session.user = newUser._id;
+				return res.json({ success: true, user: req.session.user._id });
+		} else {
+			req.session.user = newUser._id;
+			return res.json({ success: true, user: req.session.user._id });
+		}
+	} else {
+	res.status(401).json({ token: req.session.token, error: "Invalid signature or didn't have session token" });
+}
 });
 
+router.get("/session/", (req, res) => {
+	res.json({ user: req.session.user_id });
+});
 
 module.exports = router;

@@ -22,6 +22,6 @@ const ExamSchema = new mongoose.Schema({
 		type: String,
 		required: true,
 	},
-});
+}, autoCreate=  true);
 
 module.exports = mongoose.model("Exam", ExamSchema);
