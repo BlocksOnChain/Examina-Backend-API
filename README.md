@@ -1,16 +1,52 @@
-# Creating Classrooms and Private Exams
+# Examina Backend API
 
-## Steps
+This is the backend API for the Examina application. It is built using Express.js and MongoDB.
 
-### Öğretmenin Classroom (Sınıf) Oluşturması:
-Öğretmenin belirli kullanıcıları sınıflara atayabilmesi için bir sınıf modeli ve rotası oluşturulmalıdır.
-- Creating Classroom Model
+## Prerequisites
 
-### Sınav Oluşturma Yetkilendirme:
-Sınav oluşturma rotasında, öğretmenin sadece belirli sınıflara sınav oluşturabilmesini sağlayacak yetkilendirme yapılmalıdır.
-- Creating classroom route
+Before running the API, make sure you have the following installed:
 
-### Öğrenciye Sınav Atama:
-Öğretmen, belirli bir sınavı belirli bir sınıfa atayabilmelidir.
-- Updating exam-create route for authorization
+- Node.js
+- MongoDB
 
+## Getting Started
+
+1. Clone the repository:
+
+    ```bash
+    git clone https://github.com/your-username/Examina-Backend-API.git
+    ```
+
+2. Install the dependencies:
+
+    ```bash
+    npm install
+    ```
+
+3. Configure the MongoDB connection:
+
+    Open the `config.js` file and update the MongoDB connection URL with your own credentials.
+
+4. Start the server:
+
+    ```bash
+    npm start
+    ```
+
+    The API will be available at `http://localhost:5000`.
+
+## API Endpoints
+ GET /register route renders the register view.
+ POST /register_with_email route creates a new user with an email and password.
+ GET /session/get-message-to-sign/:walletAddress route generates a message to sign with a wallet address.
+ POST / route verifies the signature and creates a new user if the signature is valid.
+ GET /session/ route returns the user's session.
+
+
+## Contributing
+
+Contributions are welcome! If you find any issues or have suggestions for improvements, please open an issue or submit a pull request.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
