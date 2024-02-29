@@ -10,7 +10,7 @@ const isAuthenticated = require("../middleware/auth");
 router.use((req, res, next) => {
 	isAuthenticated(req, res, next)
 })
-router.get("/create" ,(req, res) => {
+router.get("/create", (req, res) => {
 	res.render("exams/create");
 });
 
@@ -70,13 +70,23 @@ router.post("/", async (req, res) => {
 			});
 		}
 
-		await Exam.create(req.body);
-		res.redirect("/dashboard");
+		await Exam.create(creator = req.user, title = req.body.title, questions = req.body.questions, rootHash = req.body.rootHash, contract_address = req.body.contract_address);
+		res.json({ success: true, message: "Exam created successfully" });
 	} catch (error) {
 		console.log(error);
 		res.render("error/500");
 	}
 });
+
+router.post("/create", async (req, res) => {
+	try {
+		await Exam.create(creator = req.session.user, title = req.body.title, questions = req.body.questions, rootHash = req.body.rootHash, contract_address = req.body.contract_address);
+		res.status(200).json({ message: "Exam created successfully" });
+	} catch (err) {
+		res.status(500).json({ message: err });
+	}
+});
+
 
 router.get("/", async (req, res) => {
 	try {
@@ -102,7 +112,7 @@ router.get("/:id", async (req, res) => {
 });
 
 // create an answer and push it to the exam
-router.post("/:id", async (req, res) => {
+router.post("/:id/answer/submit", async (req, res) => {
 	try {
 		const hashInput = req.body.address + JSON.stringify(req.body.answers);
 		const answerHash = crypto
@@ -118,8 +128,8 @@ router.post("/:id", async (req, res) => {
 		if (!exam) {
 			return res.render("error/404");
 		}
-
-		exam.userAnswers.push(newAnswer);
+		// Find answers by user inside Answer schema
+		const userAnswers = await Answer.find({ user: req.body.address });
 
 		// Build the Merkle Tree with answerHash values
 		const merkleTree = new MerkleTree(
@@ -131,7 +141,6 @@ router.post("/:id", async (req, res) => {
 
 		// Update the Exam document with the new rootHash
 		await Exam.findByIdAndUpdate(examId, {
-			userAnswers: exam.userAnswers,
 			rootHash: updatedRootHash,
 		});
 

@@ -30,11 +30,15 @@ router.get("/session/get-message-to-sign/:walletAddress", (req, res) => {
 	// save token to user's session
 	req.session.token = token;
 	const message = 
-	`Click "Sign" to sign in. No password needed!
-	This request will not trigger a blockchain transaction or cost any gas fees.
-    I accept the Auro Test zkApp Terms of Service: https://test-zkapp.aurowallet.com
-	data: ${req.session.token}
-	wallet: ${walletAddress}`;
+	`Click "Sign" to sign
+	This request will not trigger a blockchain transaction 
+	or cost any gas fees.
+    I accept the Auro Test zkApp Terms of Service: 
+	https://test-zkapp.aurowallet.com
+	data: 
+	${req.session.token}
+	wallet: 
+	${walletAddress}`;
 	req.message = message;
 	res.send(message);
 });
@@ -47,7 +51,7 @@ router.post("/", (req, res) => {
 		signature: signature,
 	};
 	const verifyResult = signerClient.verifyMessage(verifyBody);
-	if (verifyResult && req.session.token) {
+	if (verifyResult) {
 	// Create user if not exists
 		User.findOne
 		({ walletAddress: walletAddress }, (err, user) => {
