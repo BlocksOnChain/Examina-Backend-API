@@ -14,7 +14,7 @@ Before running the API, make sure you have the following installed:
 1. Clone the repository:
 
     ```bash
-    git clone https://github.com/your-username/Examina-Backend-API.git
+    git clone https://github.com/Esayf/Examina-Backend-API.git
     ```
 
 2. Install the dependencies:
@@ -25,12 +25,12 @@ Before running the API, make sure you have the following installed:
 
 3. Configure the MongoDB connection:
 
-    Open the `config.js` file and update the MongoDB connection URL with your own credentials.
+    Open the `config/config.env` file and update the MongoDB connection URL with your own credentials.
 
-4. Start the server:
+4. Start the server as dev:
 
     ```bash
-    npm start
+    npm run dev
     ```
 
     The API will be available at `http://localhost:5000`.
