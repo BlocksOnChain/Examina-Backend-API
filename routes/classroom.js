@@ -1,9 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const Classroom = require("../models/Classroom");
-const { isAuthenticated } = require("../middleware/auth");
+const isAuthenticated = require("../middleware/auth");
 
-router.post("/", isAuthenticated, async (req, res) => {
+router.use((req, res, next) => {
+	isAuthenticated(req, res, next)
+})
+router.post("/", async (req, res) => {
 	try {
 		const { name, teacherId, studentIds } = req.body;
 		const classroom = await Classroom.create({

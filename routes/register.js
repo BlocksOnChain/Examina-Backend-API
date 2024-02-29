@@ -2,8 +2,9 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 const User = require("../models/User");
-const { signerClient } = require("../app");
-
+var Client = require("mina-signer");
+// mainnet or testnet
+const signerClient = new Client({ network: "testnet" });
 router.get('/register', (req, res) => {
     res.render('register');
 });
@@ -23,19 +24,19 @@ router.post("/register_with_email", (req, res) => {
 	});
 });
 
-router.get("/session/get-message-to-sign", (req, res) => {
+router.get("/session/get-message-to-sign/:walletAddress", (req, res) => {
+	const { walletAddress } = req.params;
 	const token = Math.random().toString(36).substring(7);
 	// save token to user's session
 	req.session.token = token;
-	// save cookie as token
-	res.cookie("token", token);
-	const message = `Click "Sign" to sign in. No password needed!`
-		+ `This request will not trigger a blockchain transaction or cost any gas fees.`
-		+ `I accept the Auro Test zkApp Terms of Service: https://test-zkapp.aurowallet.com \n`
-		+ `data: ${req.session.token} \n`
-		+ `wallet: ${req.user.walletAddress}`;
+	const message = 
+	`Click "Sign" to sign in. No password needed!
+	This request will not trigger a blockchain transaction or cost any gas fees.
+    I accept the Auro Test zkApp Terms of Service: https://test-zkapp.aurowallet.com
+	data: ${req.session.token}
+	wallet: ${walletAddress}`;
 	req.message = message;
-	res.json({ message });
+	res.send(message);
 });
 
 router.post("/", (req, res) => {
