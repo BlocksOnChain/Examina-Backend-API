@@ -14,6 +14,10 @@ const QuestionSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    description: {
+        type: String,
+        required: false
+    },
     options: [{
         number: {
             type: Number,
@@ -23,12 +27,11 @@ const QuestionSchema = new mongoose.Schema({
             type: String,
             required: true,
         },
-        isCorrect: {
-            type: Boolean,
-            required: true
-        },
     }],
-    
+    correctAnswer: {
+        type: Number,
+        required: true,
+    },
 }, autoCreate = true);
 
 module.exports = mongoose.model("Question", QuestionSchema);

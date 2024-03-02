@@ -46,20 +46,26 @@ router.post("/", async (req, res) => {
 router.post("/create", async (req, res) => {
 	try {
 		const user = await User.findById(req.session.user);
-		if(!user) {
+		if (!user) {
 			return res.status(404).json({ message: "User not found" });
 		}
 		const newExam = new Exam({
-			creator: user._id, title: req.body.title,
-			rootHash: req.body.rootHash, secretKey: req.body.secretKey
+			creator: user._id,
+			title: req.body.title,
+			description: req.body.description,
+			startDate: req.body.startDate,
+			duration: req.body.duration,
+			rootHash: req.body.rootHash,
+			secretKey: req.body.secretKey
 		});
-		// Add newExam._id to each question in req.body.questions
-		const questions = req.body.questions.map((question) => {
-			question.exam = newExam._id;
-			return question;
-		});
+
 		newExam.save().then((result) => {
 			console.log(result);
+			// Add newExam._id to each question in req.body.questions
+			const questions = req.body.questions.map((question) => {
+				question.exam = newExam._id;
+				return question;
+			});
 			Question.insertMany(questions).then((result) => {
 				console.log("Insterted many questions", result);
 			}).catch((err) => {
@@ -68,41 +74,12 @@ router.post("/create", async (req, res) => {
 			res.status(200).json({ message: "Exam created successfully", newExam: result });
 		}).catch((err) => {
 			console.log(err)
-			res.status(500).send({ type: "Error when saving"});
+			res.status(500).send({ type: "Error when saving" });
 		});
 	} catch (err) {
 		res.status(500).json({ message: err });
 	}
 });
-// Give me an example json body post request for the route /exams/create
-/*
-{
-	"title": "test4",
-	"questions": [
-		{
-			"questionText": "Byzantine",
-			"options": [
-				{"optionText": "Nikephoros III", "isCorrect": false},
-				{"optionText": "Alexios I", "isCorrect": false},
-				{"optionText": "John II", "isCorrect": true},
-				{"optionText": "Manuel I", "isCorrect": false}
-				{"optionText": "Manuel II", "isCorrect": false}
-			]
-		},
-		{
-			"questionText": "Ottoman",
-			"options": [
-				{"optionText": "Bayezid I", "isCorrect": true},
-				{"optionText": "Mehmed I", "isCorrect": false},
-				{"optionText": "Murad II", "isCorrect": false},
-				{"optionText": "Mehmed II", "isCorrect": false},
-				{"optionText": "Mehmed III", "isCorrect": false}
-			]
-		},
-	]
-}
-*/
-
 router.get("/", async (req, res) => {
 	try {
 		const exams = await Exam.find();
@@ -141,7 +118,7 @@ router.post("/:id/answer/submit", async (req, res) => {
 		const exam = await Exam.findById(examId);
 
 		if (!exam) {
-			return res.status(500).json({message: "Exam not found"});
+			return res.status(500).json({ message: "Exam not found" });
 		}
 		// Find answers by user inside Answer schema
 		let userAnswers = await Answer.findOne({ user: user._id, exam: examId });
@@ -185,7 +162,7 @@ router.delete("/:id", async (req, res) => {
 	}
 });
 
-router.get("/:id/question/:questionid" , async (req, res) => {
+router.get("/:id/question/:questionid", async (req, res) => {
 	try {
 		const exam = await Exam.findById(req.params.id);
 		if (!exam) {
@@ -200,7 +177,7 @@ router.get("/:id/question/:questionid" , async (req, res) => {
 		console.error(err);
 		res.render("error/500");
 	}
-}); 
+});
 
 router.get("/:id/questions", async (req, res) => {
 	try {
@@ -256,71 +233,5 @@ router.get("/question/:id", async (req, res) => {
 		res.render("error/500");
 	}
 });
-//Example questions:
-		/* 
-		"questions": [
-        {
-			"number" : 1,
-            "text": "Bqqntiwe",
-            "options": [
-                {
-					"number": 1,
-                    "text": "Nsaaikephoros sII",
-                    "isCorrect": false
-                },
-                {
-					"number": 2,
-                    "text": "Alexiodsaas Is",
-                    "isCorrect": false
-                },
-                {
-					"number": 3,
-                    "text": "John IIs",
-                    "isCorrect": true
-                },
-                {
-					"number": 4,
-                    "text": "Manuel Is",
-                    "isCorrect": false
-                },
-                {
-					"number": 5,
-                    "text": "Manuel IIss",
-                    "isCorrect": false
-                }
-            ]
-        },
-        {
-			"number" : 2,
-            "text": "Ottwqqoman",
-            "options": [
-                {
-					"number": 1,
-                    "text": "Bayasaaad I",
-                    "isCorrect": true
-                },
-                {
-					"number": 2,
-                    "text": "Mehdsdsmed I",
-                    "isCorrect": false
-                },
-                {
-					"number": 3,
-                    "text": "Murad II",
-                    "isCorrect": false
-                },
-                {
-					"number": 4,
-                    "text": "Mehmed II",
-                    "isCorrect": false
-                },
-                {
-					"number": 5,
-                    "text": "Mehmed III",
-                    "isCorrect": false
-                }
-            ]
-        }
-    ],
-		*/
+
 module.exports = router;

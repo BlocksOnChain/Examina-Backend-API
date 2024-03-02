@@ -12,7 +12,7 @@ router.get("/session/get-message-to-sign/:walletAddress", (req, res) => {
 	// save token to user's session
 	req.session.token = token;
 	const message =
-		`${req.session.token}${walletAddress}`;
+		`Please sign the message to register your session, it does not require any gas,${req.session.token}${walletAddress}`;
 	req.session.message = message;
 	console.log(req.session.message);
 	res.json({ "message": message });
@@ -27,7 +27,7 @@ router.post("/", async (req, res) => {
 		signature: signture,
 	}
 	const verifyResult = signerClient.verifyMessage(verifyBody);
-	if (!verifyResult && req.session.token) {
+	if (verifyResult && req.session.token) {
 		// Create user if not exists
 		const user = await User.find({ walletAddress: walletAddress })
 		if (user.length == 0) {

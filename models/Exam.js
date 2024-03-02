@@ -11,11 +11,23 @@ const ExamSchema = new mongoose.Schema({
 		required: true,
 		trim: true,
 	},
+	description: {
+		type: String,
+		required: false,
+	},
+	duration: {
+		type: Number,
+		required: false,
+	},
+	startDate: {
+		type: Date,
+		required: false,
+	},
 	rootHash: {
 		type: String,
 		required: true,
 	},
-	contract_address: {
+	contractAddress: {
 		type: String,
 		required: false,
 	},
