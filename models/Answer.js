@@ -18,11 +18,15 @@ const userAnswerSchema = new mongoose.Schema({
             required: true,
         },
         selectedOption: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Option',
+            type: Number,
+            required: true,
         },
+        answerHash: {
+            type: String,
+            required: true,
+        },    
     }],
-},   autoCreate=  true,
+}, autoCreate = true,
 );
 
 module.exports = mongoose.model("Answer", userAnswerSchema);

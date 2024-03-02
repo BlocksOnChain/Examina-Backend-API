@@ -1,6 +1,4 @@
 const mongoose = require("mongoose");
-const QuestionSchema = require("./Question").schema;
-
 
 const ExamSchema = new mongoose.Schema({
 	creator: {
@@ -13,15 +11,18 @@ const ExamSchema = new mongoose.Schema({
 		required: true,
 		trim: true,
 	},
-	questions: [QuestionSchema],
 	rootHash: {
 		type: String,
 		required: true,
 	},
 	contract_address: {
 		type: String,
+		required: false,
+	},
+	secretKey: {
+		type: String,
 		required: true,
 	},
-}, autoCreate=  true);
+}, autoCreate = true);
 
 module.exports = mongoose.model("Exam", ExamSchema);
