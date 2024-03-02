@@ -47,7 +47,7 @@ router.post("/", async (req, res) => {
 });
 
 router.get("/session", (req, res) => {
-	res.json({ user: req.session.user });
+	res.json({ user: req.session.token });
 });
 
 module.exports = router;
