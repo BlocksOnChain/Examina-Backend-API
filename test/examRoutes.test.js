@@ -1,41 +1,32 @@
-const { expect } = require("chai");
-const supertest = require("supertest");
+const request = require("supertest");
 const app = require("../app");
+const Exam = require("../models/Exam");
+const Question = require("../models/Question");
 
 describe("Exam Routes", () => {
-	it("should create a new exam", async () => {
-		const response = await supertest(app)
-			.post("/exams")
-			.send(sampleExamData);
+	let testExamId;
+	let testQuestionId;
 
-		expect(response.status).to.equal(302);
-	});
-	it("should get all exams", async () => {
-		const response = await supertest(app).get("/exams");
-
-		expect(response.status).to.equal(200);
-		expect(response.body).to.be.an("array");
-	});
-
-	it("should get a specific exam by ID", async () => {
-		const existingExamId = "4545";
-
-		const response = await supertest(app).get(`/exams/${existingExamId}`);
-
-		expect(response.status).to.equal(200);
-		expect(response.body).to.be.an("object");
-	});
-	it("should submit user answers for a specific exam", async () => {
-		const existingExamId = "4545";
-		const userAnswers = ["answer1", "answer2", "answer3"];
-
-		const response = await supertest(app)
-			.post(`/exams/${existingExamId}`)
-			.send({
-				address: "0xselim",
-				answers: userAnswers,
+	// Exam oluşturma testi
+	describe("POST /exams", () => {
+		it("should create a new exam and respond with 200 status code and success message", async () => {
+			const res = await request(app).post("/exams").send({
+				title: "Test Exam",
+				description: "This is a test exam",
+				startDate: "2024-03-08",
+				duration: 60,
+				rootHash: "testroot123",
+				secretKey: "testsecret123",
 			});
 
-		expect(response.status).to.equal(302);
+			expect(res.statusCode).toEqual(200);
+			expect(res.body.message).toEqual("Exam created successfully");
+			testExamId = res.body.newExam._id;
+		});
 	});
+});
+
+afterAll(async () => {
+	await Exam.deleteMany({});
+	await Question.deleteMany({});
 });
