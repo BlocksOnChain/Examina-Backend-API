@@ -24,6 +24,15 @@ describe("Exam Routes", () => {
 			testExamId = res.body.newExam._id;
 		});
 	});
+
+	// Exam bilgilerini alma testi
+	describe("GET /exams/:id", () => {
+		it("should respond with 200 status code and the exam details", async () => {
+			const res = await request(app).get(`/exams/${testExamId}`);
+			expect(res.statusCode).toEqual(200);
+			expect(res.body._id).toEqual(testExamId);
+		});
+	});
 });
 
 afterAll(async () => {
