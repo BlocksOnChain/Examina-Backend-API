@@ -1,5 +1,6 @@
 const express = require("express");
 const dotenv = require("dotenv");
+var cors = require('cors');
 const morgan = require("morgan");
 const exphbs = require("express-handlebars");
 const connectDB = require("./config/db");
@@ -15,6 +16,7 @@ connectDB();
 const app = express();
 
 app.use(compression());
+app.use(cors())
 
 app.use(express.static(path.join(__dirname, "public")));
 
