@@ -16,7 +16,16 @@ connectDB();
 const app = express();
 
 app.use(compression());
-app.use(cors())
+app.use(
+	cors({
+		origin: [
+		"http://localhost:3000/",
+		"https://examina.space/",
+		"https://examina.space/",
+		],
+		credentials: true,
+	})
+);
 
 app.use(express.static(path.join(__dirname, "public")));
 
