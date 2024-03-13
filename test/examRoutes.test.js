@@ -33,6 +33,22 @@ describe("Exam Routes", () => {
 			expect(res.body._id).toEqual(testExamId);
 		});
 	});
+
+	// Soru ekleme testi
+	describe("POST /exams/:id/questions", () => {
+		it("should add a new question to the exam and respond with 200 status code", async () => {
+			const res = await request(app)
+				.post(`/exams/${testExamId}/questions`)
+				.send({
+					text: "Test Question",
+					options: ["Option 1", "Option 2", "Option 3"],
+					correctOptionIndex: 0,
+				});
+
+			expect(res.statusCode).toEqual(200);
+			testQuestionId = res.body._id;
+		});
+	});
 });
 
 afterAll(async () => {
