@@ -49,6 +49,23 @@ describe("Exam Routes", () => {
 			testQuestionId = res.body._id;
 		});
 	});
+
+	// Answer gönderme testi
+	describe("POST /exams/:id/answer/submit", () => {
+		it("should submit an answer and respond with 200 status code", async () => {
+			const res = await request(app)
+				.post(`/exams/${testExamId}/answer/submit`)
+				.send({
+					answer: {
+						questionId: testQuestionId,
+						selectedOption: 0,
+					},
+				});
+
+			expect(res.statusCode).toEqual(200);
+			expect(res.body.message).toEqual("Answer submitted successfully");
+		});
+	});
 });
 
 afterAll(async () => {
