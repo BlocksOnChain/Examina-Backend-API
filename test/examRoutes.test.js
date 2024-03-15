@@ -66,6 +66,15 @@ describe("Exam Routes", () => {
 			expect(res.body.message).toEqual("Answer submitted successfully");
 		});
 	});
+	
+	// Exam silme testi
+	describe("DELETE /exams/:id", () => {
+		it("should delete the exam and respond with 200 status code", async () => {
+			const res = await request(app).delete(`/exams/${testExamId}`);
+			expect(res.statusCode).toEqual(200);
+			expect(res.body.message).toEqual("Exam deleted successfully");
+		});
+	});
 });
 
 afterAll(async () => {
