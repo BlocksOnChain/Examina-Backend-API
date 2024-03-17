@@ -2,7 +2,10 @@ const mongoose = require("mongoose");
 
 const connectDB = async () => {
 	try {
-		const conn = await mongoose.connect(process.env.MONGO_URI, {});
+		const conn = await mongoose.connect(process.env.MONGO_URI, {
+			useNewUrlParser: true,
+			useUnifiedTopology: true,
+		});
 
 		console.log(
 			`MongoDB connected: to ${conn.connection.host} with url: ${process.env.MONGO_URI}`
@@ -11,9 +14,9 @@ const connectDB = async () => {
 		const collections = await conn.db.listCollections().toArray();
 		const models = Object.keys(mongoose.models);
 		const modelNames = models.map((model) => model.toLowerCase() + "s");
-		modelNames.forEach((model) => {
+		modelNames.forEach(async (model) => {
 			if (!collections.some((collection) => collection.name === model)) {
-				conn.db.createCollection(model);
+				await conn.db.createCollection(model);
 			}
 		});
 	} catch (error) {
