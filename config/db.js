@@ -2,23 +2,34 @@ const mongoose = require("mongoose");
 
 const connectDB = async () => {
 	try {
-		const conn = await mongoose.connect(process.env.MONGO_URI, {
-			useNewUrlParser: true,
-			useUnifiedTopology: true,
-		});
+		await mongoose.connect(process.env.MONGO_URI, {});
+
+		const db = mongoose.connection.db;
+
+		if (!db) {
+			console.error("Failed to get MongoDB database.");
+			return;
+		}
 
 		console.log(
-			`MongoDB connected: to ${conn.connection.host} with url: ${process.env.MONGO_URI}`
+			`MongoDB connected to ${mongoose.connection.host} with url: ${process.env.MONGO_URI}`
 		);
-		// create collections from models in mongo db if they are not already created
-		const collections = await conn.db.listCollections().toArray();
+
+		// Koleksiyonları kontrol et ve gerekiyorsa oluştur
+		const collections = await db.collections();
+
+		const existingCollections = collections.map(
+			(collection) => collection.collectionName
+		);
 		const models = Object.keys(mongoose.models);
 		const modelNames = models.map((model) => model.toLowerCase() + "s");
-		modelNames.forEach(async (model) => {
-			if (!collections.some((collection) => collection.name === model)) {
-				await conn.db.createCollection(model);
+
+		for (const model of modelNames) {
+			if (!existingCollections.includes(model)) {
+				await db.createCollection(model);
+				console.log(`Collection ${model} created.`);
 			}
-		});
+		}
 	} catch (error) {
 		console.error(error);
 		process.exit(1);

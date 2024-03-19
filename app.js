@@ -1,6 +1,6 @@
 const express = require("express");
 const dotenv = require("dotenv");
-var cors = require('cors');
+var cors = require("cors");
 const morgan = require("morgan");
 const exphbs = require("express-handlebars");
 const connectDB = require("./config/db");
@@ -8,7 +8,6 @@ const compression = require("compression");
 const path = require("path");
 const session = require("express-session");
 const MemoryStore = require("memorystore")(session);
-const cors = require("cors");
 
 dotenv.config({ path: "./config/config.env" });
 
@@ -16,21 +15,7 @@ connectDB();
 
 const app = express();
 
-app.use(cors());
-
 app.use(compression());
-app.use(
-	cors({
-		origin: [
-		"http://localhost:3000/",
-		"https://examina.space",
-		"https://examina.space/",
-		"https://www.examina.space/",
-		"https://www.examina.space"
-		],
-		credentials: true,
-	})
-);
 
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -38,7 +23,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 var sess = {
 	secret: "examina the best",
-	cookie: {},
+	cookie: { secure: false },
 	resave: false,
 	saveUninitialized: true,
 };
@@ -48,7 +33,23 @@ if (app.get("env") === "production") {
 	sess.store = new MemoryStore({
 		checkPeriod: 86400000, // prune expired entries every 24h
 	});
+	app.use(
+		cors({
+			origin: [
+				"http://localhost:3000/",
+				"https://examina.space",
+				"https://examina.space/",
+				"https://www.examina.space/",
+				"https://www.examina.space",
+			],
+			credentials: true,
+		})
+	);
 }
+
+sess.store = new MemoryStore({
+	checkPeriod: 86400000, // prune expired entries every 24h
+});
 
 app.use(session(sess));
 if (process.env.NODE_ENV === "development") {
