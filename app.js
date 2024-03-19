@@ -20,8 +20,10 @@ app.use(
 	cors({
 		origin: [
 		"http://localhost:3000/",
+		"https://examina.space",
 		"https://examina.space/",
-		"https://examina.space/",
+		"https://www.examina.space/",
+		"https://www.examina.space"
 		],
 		credentials: true,
 	})
