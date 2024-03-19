@@ -2,6 +2,9 @@
 
 This is the backend API for the Examina application. It is built using Express.js and MongoDB.
 
+## You can check the diagram for the API flow from here :
+https://drive.google.com/file/d/1PI3lqNI9EkaBnj8c4wtQMHXOVWOwuigK/view?usp=sharing
+
 ## Prerequisites
 
 Before running the API, make sure you have the following installed:
