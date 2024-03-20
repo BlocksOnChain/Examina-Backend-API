@@ -1,3 +1,23 @@
+jest.mock("express-session", () => {
+	return jest.fn(() => {
+		return (req, res, next) => {
+			req.session = {
+				token: Math.floor(10000 + Math.random() * 90000),
+			};
+			next();
+		};
+	});
+});
+
+jest.mock("memorystore", () => {
+	const session = require("express-session");
+	const MemoryStore = require("express-session").MemoryStore;
+
+	return function (options) {
+		return new MemoryStore(options);
+	};
+});
+
 const request = require("supertest");
 const app = require("../app");
 const mongoose = require("mongoose");
@@ -6,17 +26,23 @@ var Client = require("mina-signer");
 // mainnet or testnet
 const signerClient = new Client({ network: "testnet" });
 
-function signTransaction(privateKey, params) {
-	let signResult;
-	try {
-		// let signClient = getSignClient();
-		let signBody = params.message;
-		signResult = signerClient.signTransaction(signBody, privateKey);
-	} catch (err) {
-		signResult = { message: String(err) };
-	}
-	return signResult;
-}
+jest.mock("express-session", () => ({
+	__esModule: true,
+	default: (options) => {
+		return (req, res, next) => {
+			// Rastgele 5 haneli bir token oluştur
+			const generateRandomToken = () => {
+				return Math.floor(10000 + Math.random() * 90000);
+			};
+
+			// Oturum nesnesini oluştur ve req.session'e ekle
+			req.session = {
+				token: generateRandomToken(),
+			};
+			next();
+		};
+	},
+}));
 
 describe("API Endpoint Tests", () => {
 	beforeAll(async () => {
