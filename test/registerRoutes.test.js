@@ -1,58 +1,25 @@
-jest.mock("express-session", () => {
-	return jest.fn(() => {
-		return (req, res, next) => {
-			req.session = {
-				token: Math.floor(10000 + Math.random() * 90000),
-			};
-			next();
-		};
-	});
-});
-
-jest.mock("memorystore", () => {
-	const session = require("express-session");
-	const MemoryStore = require("express-session").MemoryStore;
-
-	return function (options) {
-		return new MemoryStore(options);
-	};
-});
-
 const request = require("supertest");
 const app = require("../app");
 const mongoose = require("mongoose");
 const connectDB = require("../config/db");
 var Client = require("mina-signer");
+const session = require("supertest-session");
 // mainnet or testnet
 const signerClient = new Client({ network: "testnet" });
 
-jest.mock("express-session", () => ({
-	__esModule: true,
-	default: (options) => {
-		return (req, res, next) => {
-			// Rastgele 5 haneli bir token oluştur
-			const generateRandomToken = () => {
-				return Math.floor(10000 + Math.random() * 90000);
-			};
-
-			// Oturum nesnesini oluştur ve req.session'e ekle
-			req.session = {
-				token: generateRandomToken(),
-			};
-			next();
-		};
-	},
-}));
-
 describe("API Endpoint Tests", () => {
+	let testSession;
+	beforeEach(() => {
+		testSession = session(app); // Test oturumu oluşturduk
+	});
 	beforeAll(async () => {
-		await connectDB();
+		await mongoose.connect(process.env.MONGO_URI, {});
 	});
 	afterAll(async () => {
 		await mongoose.disconnect();
 	});
 	test("GET /register/session/get-message-to-sign/:walletAddress should return a message to sign for a given wallet address", async () => {
-		const res = await request(app)
+		const res = await testSession
 			.get(
 				"/register/session/get-message-to-sign/B62qmCGGG98iPmNEeFLByG3tPdnR6UvVvrXbkDPAC7DYJUvJVHFm1B3"
 			)
@@ -63,6 +30,13 @@ describe("API Endpoint Tests", () => {
 
 		expect(res.status).toBe(200);
 		expect(res.body).toHaveProperty("message");
+
+		testSession.session = testSession.session || {};
+		testSession.session.token = res.body.message;
+		testSession.session.message = res.body.message;
+
+		const resGetSession = await testSession.get("/register/session");
+		console.log("Get Session", resGetSession.body.user);
 	});
 
 	test("POST / should authenticate user and create a new user or find an existing one", async () => {
@@ -74,7 +48,7 @@ describe("API Endpoint Tests", () => {
 		};
 
 		// get a session message to verify
-		const resGet = await request(app)
+		const resGet = await testSession
 			.get(
 				"/register/session/get-message-to-sign/B62qmCGGG98iPmNEeFLByG3tPdnR6UvVvrXbkDPAC7DYJUvJVHFm1B3"
 			)
@@ -87,7 +61,11 @@ describe("API Endpoint Tests", () => {
 		const message = resGet.body.message;
 		console.log("Message: ", message);
 
-		const resGetSession = await request(app).get("/register/session");
+		testSession.session = testSession.session || {};
+		testSession.session.token = resGet.body.message;
+		testSession.session.message = { message: resGet.body.message };
+
+		const resGetSession = await testSession.get("/register/session");
 
 		console.log("Get Session", resGetSession.body.user);
 		// const signMessage_demo =
@@ -112,16 +90,21 @@ describe("API Endpoint Tests", () => {
 
 		console.log("Signature: ", signResult);
 
-		const verifyResult = signerClient.verifyMessage(signResult);
-		console.log("Verify Result :", verifyResult);
+		const verifyBody = {
+			data: { message: signParams.message },
+			publicKey: keys_demo.publicKey,
+			signature: signResult.signature,
+		};
+		console.log("Verify Body: ", verifyBody);
+
+		const verifyResult = signerClient.verifyMessage(verifyBody);
+		console.log("Test Verify Result :", verifyResult);
 
 		// send the message to endpoint to verify
-		const res = await request(app)
-			.post("/register")
-			.send({
-				walletAddress: signResult.publicKey,
-				signature: JSON.parse(JSON.stringify(signResult.signature)),
-			});
+		const res = await testSession.post("/register").send({
+			walletAddress: signResult.publicKey,
+			signature: JSON.parse(JSON.stringify(signResult.signature)),
+		});
 		if (res.status === 401) {
 			console.log(res.body.error);
 		}
@@ -130,3 +113,5 @@ describe("API Endpoint Tests", () => {
 		expect(res.body).toHaveProperty("user");
 	});
 });
+
+// elimde böyle bir test kodu var. görüldüğü üzere akış şu şekilde olmalı: get ile kullanıcıya bir session token'ı ve imzalaması için bir mesaj oluşturuluyor. Kullanıcı bu mesajı post register ile imzalayarak session oluşturacak. bu noktada uygulamanın kendisini çalıştırdığımda yapabilir olduğum bu akışı test esnasında yapamıyorum. Fark ettim ki req.session oluşmuyor test sırasında. test sırasında da req.session oluşturmalı ve içindeki verileri kullanabilmeliyim. bunun için req.session taklit etmek veya req.sessionı test sırasında da kullanabilmek gibi yöntemler var mı? varsa nasıl uygulamalıyım? Önemli bir uyarı da vereyim: testlerin çalışması için req.sessiona yönelik yapacağım değişiklikler, uygulamanın kendi çalışma akışını etkilememeli. lütfen bunları göz önünde bulundurarak bana çözüm önerileri ver

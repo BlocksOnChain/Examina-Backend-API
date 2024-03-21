@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const passport = require("passport");
 const User = require("../models/User");
 var Client = require("mina-signer");
 // mainnet or testnet
@@ -12,13 +11,14 @@ router.get("/session/get-message-to-sign/:walletAddress", (req, res) => {
 	// save token to user's session
 	req.session.token = token;
 	const message = `${req.session.token}${walletAddress}`;
-	req.session.message = message;
-	console.log(req.session.message);
+	req.session.message = { message: message };
+	console.log("GET req.session.message: ", req.session.message);
 	res.json({ message: message });
 });
 
 router.post("/", async (req, res) => {
 	const { walletAddress, signature } = req.body;
+	console.log("Req.session.message: ", req.session.message);
 	var signture =
 		typeof signature === "string" ? JSON.parse(signature) : signature;
 	const verifyBody = {
@@ -31,6 +31,8 @@ router.post("/", async (req, res) => {
 	console.log("Signature: ", verifyBody.signature);
 
 	const verifyResult = signerClient.verifyMessage(verifyBody);
+	console.log("Req.session.token: ", req.session.token);
+	console.log("Verify Result: ", verifyResult);
 	if (verifyResult && req.session.token) {
 		// Create user if not exists
 		try {
