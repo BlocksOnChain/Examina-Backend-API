@@ -2,8 +2,64 @@ const request = require("supertest");
 const app = require("../app");
 const Exam = require("../models/Exam");
 const Question = require("../models/Question");
+const session = require("supertest-session");
+const mongoose = require("mongoose");
 
 describe("Exam Routes", () => {
+	let testSession;
+	beforeEach(async () => {
+		testSession = session(app); // Test oturumu oluşturduk
+		const keys_demo = {
+			publicKey:
+				"B62qmCGGG98iPmNEeFLByG3tPdnR6UvVvrXbkDPAC7DYJUvJVHFm1B3",
+			privateKey: "EKEjW2PYb6cW5WD26ivv1wqR6AKT3a64zHbCg6VwoinhSQKAUnKQ",
+		};
+
+		// get a session message to verify
+		const resGet = await testSession
+			.get(
+				"/register/session/get-message-to-sign/B62qmCGGG98iPmNEeFLByG3tPdnR6UvVvrXbkDPAC7DYJUvJVHFm1B3"
+			)
+			.query({
+				walletAddress:
+					"B62qmCGGG98iPmNEeFLByG3tPdnR6UvVvrXbkDPAC7DYJUvJVHFm1B3",
+			});
+
+		// extract the message
+		const message = resGet.body.message;
+
+		testSession.session = testSession.session || {};
+		testSession.session.token = resGet.body.message;
+		testSession.session.message = { message: resGet.body.message };
+		const signParams = {
+			message: message,
+		};
+		// const signRes = signTransaction(keys_demo.privateKey, signParams);
+		let signResult;
+		try {
+			// let signClient = getSignClient();
+			// let signBody = params.message;
+			signResult = signerClient.signMessage(
+				signParams,
+				keys_demo.privateKey
+			);
+		} catch (err) {
+			signResult = { message: String(err) };
+		}
+
+		// send the message to endpoint to verify
+		const res = await testSession.post("/register").send({
+			walletAddress: signResult.publicKey,
+			signature: JSON.parse(JSON.stringify(signResult.signature)),
+		});
+	});
+	beforeAll(async () => {
+		await mongoose.connect(process.env.MONGO_URI, {});
+	});
+	afterAll(async () => {
+		await mongoose.disconnect();
+	});
+
 	let testExamId;
 	let testQuestionId;
 
@@ -66,7 +122,7 @@ describe("Exam Routes", () => {
 			expect(res.body.message).toEqual("Answer submitted successfully");
 		});
 	});
-	
+
 	// Exam silme testi
 	describe("DELETE /exams/:id", () => {
 		it("should delete the exam and respond with 200 status code", async () => {

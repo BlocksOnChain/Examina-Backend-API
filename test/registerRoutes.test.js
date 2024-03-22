@@ -1,7 +1,6 @@
 const request = require("supertest");
 const app = require("../app");
 const mongoose = require("mongoose");
-const connectDB = require("../config/db");
 var Client = require("mina-signer");
 const session = require("supertest-session");
 // mainnet or testnet
@@ -113,5 +112,3 @@ describe("API Endpoint Tests", () => {
 		expect(res.body).toHaveProperty("user");
 	});
 });
-
-// elimde böyle bir test kodu var. görüldüğü üzere akış şu şekilde olmalı: get ile kullanıcıya bir session token'ı ve imzalaması için bir mesaj oluşturuluyor. Kullanıcı bu mesajı post register ile imzalayarak session oluşturacak. bu noktada uygulamanın kendisini çalıştırdığımda yapabilir olduğum bu akışı test esnasında yapamıyorum. Fark ettim ki req.session oluşmuyor test sırasında. test sırasında da req.session oluşturmalı ve içindeki verileri kullanabilmeliyim. bunun için req.session taklit etmek veya req.sessionı test sırasında da kullanabilmek gibi yöntemler var mı? varsa nasıl uygulamalıyım? Önemli bir uyarı da vereyim: testlerin çalışması için req.sessiona yönelik yapacağım değişiklikler, uygulamanın kendi çalışma akışını etkilememeli. lütfen bunları göz önünde bulundurarak bana çözüm önerileri ver
