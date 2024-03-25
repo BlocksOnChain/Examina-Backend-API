@@ -15,43 +15,10 @@ router.get("/create", (req, res) => {
 	res.render("exams/create");
 });
 
-router.post("/", async (req, res) => {
-	try {
-		// Check if the logged-in user is a teacher
-		if (req.user.role !== "teacher") {
-			return res.status(403).json({ message: "Unauthorized" });
-		}
-
-		// Check if the logged-in teacher is allowed to create the exam for the given classroom
-		const classroomId = req.body.classroomId;
-		const classroom = await Classroom.findById(classroomId);
-		if (
-			!classroom ||
-			classroom.teacher.toString() !== req.user._id.toString()
-		) {
-			return res.status(403).json({
-				message:
-					"You are not allowed to create exams for this classroom",
-			});
-		}
-
-		await Exam.create(
-			(creator = req.user),
-			(title = req.body.title),
-			(questions = req.body.questions),
-			(rootHash = req.body.rootHash),
-			(contract_address = req.body.contract_address)
-		);
-		res.json({ success: true, message: "Exam created successfully" });
-	} catch (error) {
-		console.log(error);
-		res.render("error/500");
-	}
-});
-
 router.post("/create", async (req, res) => {
 	try {
 		const user = await User.findById(req.session.user);
+		// console.log("User: ", user._id);
 		if (!user) {
 			return res.status(404).json({ message: "User not found" });
 		}
@@ -94,15 +61,15 @@ router.post("/create", async (req, res) => {
 		res.status(500).json({ message: err });
 	}
 });
-router.get("/", async (req, res) => {
-	try {
-		const exams = await Exam.find();
-		res.json(exams);
-	} catch (err) {
-		console.error(err);
-		res.render("error/500");
-	}
-});
+// router.get("/", async (req, res) => {
+// 	try {
+// 		const exams = await Exam.find();
+// 		res.json(exams);
+// 	} catch (err) {
+// 		console.error(err);
+// 		res.render("error/500");
+// 	}
+// });
 
 router.get("/:id", async (req, res) => {
 	try {
@@ -161,28 +128,28 @@ router.post("/:id/answer/submit", async (req, res) => {
 		res.status(500).json({ message: error.message });
 	}
 });
-router.delete("/:id", async (req, res) => {
-	try {
-		const examId = req.params.id;
-		const userId = req.user._id;
+// router.delete("/:id", async (req, res) => {
+// 	try {
+// 		const examId = req.params.id;
+// 		const userId = req.user._id;
 
-		// Find the exam by ID and check if the logged-in teacher created it
-		const exam = await Exam.findOne({ _id: examId, creator: userId });
-		if (!exam) {
-			return res.status(404).json({
-				message:
-					"Exam not found or you are not authorized to delete it",
-			});
-		}
+// 		// Find the exam by ID and check if the logged-in teacher created it
+// 		const exam = await Exam.findOne({ _id: examId, creator: userId });
+// 		if (!exam) {
+// 			return res.status(404).json({
+// 				message:
+// 					"Exam not found or you are not authorized to delete it",
+// 			});
+// 		}
 
-		// Delete the exam
-		await Exam.findByIdAndDelete(examId);
-		res.json({ message: "Exam deleted successfully" });
-	} catch (error) {
-		console.error(error);
-		res.status(500).json({ message: "Internal Server Error" });
-	}
-});
+// 		// Delete the exam
+// 		await Exam.findByIdAndDelete(examId);
+// 		res.json({ message: "Exam deleted successfully" });
+// 	} catch (error) {
+// 		console.error(error);
+// 		res.status(500).json({ message: "Internal Server Error" });
+// 	}
+// });
 
 router.get("/:id/question/:questionid", async (req, res) => {
 	try {

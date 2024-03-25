@@ -4,10 +4,14 @@ const Exam = require("../models/Exam");
 const Question = require("../models/Question");
 const session = require("supertest-session");
 const mongoose = require("mongoose");
+var Client = require("mina-signer");
+const { questions } = require("./testQuestions");
 
-describe("Exam Routes", () => {
+const signerClient = new Client({ network: "testnet" });
+
+describe("Exam Endpoint Tests", () => {
 	let testSession;
-	beforeEach(async () => {
+	beforeAll(async () => {
 		testSession = session(app); // Test oturumu oluşturduk
 		const keys_demo = {
 			publicKey:
@@ -34,11 +38,8 @@ describe("Exam Routes", () => {
 		const signParams = {
 			message: message,
 		};
-		// const signRes = signTransaction(keys_demo.privateKey, signParams);
 		let signResult;
 		try {
-			// let signClient = getSignClient();
-			// let signBody = params.message;
 			signResult = signerClient.signMessage(
 				signParams,
 				keys_demo.privateKey
@@ -57,83 +58,115 @@ describe("Exam Routes", () => {
 		await mongoose.connect(process.env.MONGO_URI, {});
 	});
 	afterAll(async () => {
+		await Exam.deleteMany({});
+		await Question.deleteMany({});
 		await mongoose.disconnect();
+		testSession = null;
 	});
 
 	let testExamId;
 	let testQuestionId;
+	let testAnswerId;
 
 	// Exam oluşturma testi
-	describe("POST /exams", () => {
-		it("should create a new exam and respond with 200 status code and success message", async () => {
-			const res = await request(app).post("/exams").send({
-				title: "Test Exam",
-				description: "This is a test exam",
-				startDate: "2024-03-08",
-				duration: 60,
-				rootHash: "testroot123",
-				secretKey: "testsecret123",
-			});
-
-			expect(res.statusCode).toEqual(200);
-			expect(res.body.message).toEqual("Exam created successfully");
-			testExamId = res.body.newExam._id;
+	test("POST /exams/create should create a new exam and respond with 200 status code and success message", async () => {
+		const res = await testSession.post("/exams/create").send({
+			title: "Test Exam",
+			description: "This is a test exam",
+			startDate: "2024-03-08",
+			duration: 60,
+			rootHash: "testroot123",
+			secretKey: "testsecret123",
+			questions: questions,
 		});
+		expect(res.statusCode).toEqual(200);
+		expect(res.body.message).toEqual("Exam created successfully");
+		testExamId = res.body.newExam._id;
 	});
 
 	// Exam bilgilerini alma testi
-	describe("GET /exams/:id", () => {
-		it("should respond with 200 status code and the exam details", async () => {
-			const res = await request(app).get(`/exams/${testExamId}`);
-			expect(res.statusCode).toEqual(200);
-			expect(res.body._id).toEqual(testExamId);
-		});
+	test("GET /exams/:id should respond with 200 status code and the exam details", async () => {
+		const res = await testSession.get(`/exams/${testExamId}`);
+		expect(res.statusCode).toEqual(200);
+		expect(res.body._id).toEqual(testExamId);
 	});
 
-	// Soru ekleme testi
-	describe("POST /exams/:id/questions", () => {
-		it("should add a new question to the exam and respond with 200 status code", async () => {
-			const res = await request(app)
-				.post(`/exams/${testExamId}/questions`)
-				.send({
-					text: "Test Question",
-					options: ["Option 1", "Option 2", "Option 3"],
-					correctOptionIndex: 0,
-				});
+	// GET /:id/questions endpoint testi
+	test("GET /exams/:id/questions should respond with 200 status code and the questions", async () => {
+		const res = await testSession.get(`/exams/${testExamId}/questions`);
+		expect(res.statusCode).toEqual(200);
+		expect(res.body).toBeDefined();
+		console.log("Questions: ", res.body);
+	});
 
-			expect(res.statusCode).toEqual(200);
-			testQuestionId = res.body._id;
-		});
+	// GET /:id/question/:questionid endpoint testi
+	test("GET /exams/:id/question/:questionid should respond with 200 status code and the details of a specific question", async () => {
+		const questionsRes = await testSession.get(
+			`/exams/${testExamId}/questions`
+		);
+
+		testQuestionId = questionsRes.body[0]._id;
+
+		const res = await testSession.get(
+			`/exams/${testExamId}/question/${testQuestionId}`
+		);
+		expect(res.statusCode).toEqual(200);
+		expect(res.body._id).toEqual(testQuestionId);
 	});
 
 	// Answer gönderme testi
-	describe("POST /exams/:id/answer/submit", () => {
-		it("should submit an answer and respond with 200 status code", async () => {
-			const res = await request(app)
-				.post(`/exams/${testExamId}/answer/submit`)
-				.send({
-					answer: {
-						questionId: testQuestionId,
-						selectedOption: 0,
-					},
-				});
+	test("POST /exams/:id/answer/submit should submit an answer and respond with 200 status code", async () => {
+		const questionsRes = await testSession.get(
+			`/exams/${testExamId}/questions`
+		);
 
-			expect(res.statusCode).toEqual(200);
-			expect(res.body.message).toEqual("Answer submitted successfully");
-		});
+		testQuestionId = questionsRes.body[0]._id;
+
+		const res = await testSession
+			.post(`/exams/${testExamId}/answer/submit`)
+			.send({
+				answer: {
+					questionId: testQuestionId,
+					selectedOption: 0,
+				},
+			});
+
+		expect(res.statusCode).toEqual(200);
+		expect(res.body.message).toEqual("Answer submitted successfully");
 	});
 
-	// Exam silme testi
-	describe("DELETE /exams/:id", () => {
-		it("should delete the exam and respond with 200 status code", async () => {
-			const res = await request(app).delete(`/exams/${testExamId}`);
-			expect(res.statusCode).toEqual(200);
-			expect(res.body.message).toEqual("Exam deleted successfully");
-		});
+	// GET /:id/answers endpoint testi
+	test("GET /exams/:id/answers should respond with 200 status code and the answers for the exam", async () => {
+		const res = await testSession.get(`/exams/${testExamId}/answers`);
+		expect(res.statusCode).toEqual(200);
+		expect(res.body).toBeDefined();
+		console.log("Answers: ", res.body);
 	});
-});
 
-afterAll(async () => {
-	await Exam.deleteMany({});
-	await Question.deleteMany({});
+	// GET /:id/answers/:answerid endpoint testi
+	test("GET /exams/:id/answers/:answerid should respond with 200 status code and the details of a specific answer", async () => {
+		const answersRes = await testSession.get(
+			`/exams/${testExamId}/answers`
+		);
+		testAnswerId = answersRes.body[0]._id;
+
+		const res = await testSession.get(
+			`/exams/${testExamId}/answers/${testAnswerId}`
+		);
+		expect(res.statusCode).toEqual(200);
+		expect(res.body._id).toEqual(testAnswerId);
+	});
+
+	// GET /question/:id endpoint testi
+	test("GET /exams/question/:id should respond with 200 status code and the details of a specific question", async () => {
+		const questionsRes = await testSession.get(
+			`/exams/${testExamId}/questions`
+		);
+
+		testQuestionId = questionsRes.body[0]._id;
+
+		const res = await testSession.get(`/exams/question/${testQuestionId}`);
+		expect(res.statusCode).toEqual(200);
+		expect(res.body._id).toEqual(testQuestionId);
+	});
 });
