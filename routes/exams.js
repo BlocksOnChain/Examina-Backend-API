@@ -78,13 +78,15 @@ router.get("/:id", async (req, res) => {
 			return res.status(404).render("error/404");
 		}
 		res.json(exam);
+		console.log("REQ.PARAMS.ID: ", req.params.id);
+		console.log("EXAM ID: ", exam.id);
+		console.log("EXAMS: ", exam);
 	} catch (err) {
 		console.error(err);
 		res.render("error/500");
 	}
 });
 
-// create an answer and push it to the exam
 router.post("/:id/answer/submit", async (req, res) => {
 	try {
 		const user = await User.findById(req.session.user);
@@ -106,21 +108,47 @@ router.post("/:id/answer/submit", async (req, res) => {
 		if (!exam) {
 			return res.status(500).json({ message: "Exam not found" });
 		}
+
+		// Calculate end time of the exam
+		const startTime = new Date(exam.startDate);
+		const endTime = new Date(startTime.getTime() + exam.duration * 60000); // Convert duration from minutes to milliseconds
+
+		// Check if the exam has already ended
+		const currentDateTime = new Date();
+
+		if (currentDateTime > endTime) {
+			return res.status(400).json({
+				message: "Exam has already ended. You cannot submit answers.",
+			});
+		}
+
 		// Find answers by user inside Answer schema
 		let userAnswers = await Answer.findOne({
 			user: user._id,
 			exam: examId,
 		});
+
 		if (!userAnswers) {
+			// If user has not answered before, create a new entry
 			userAnswers = new Answer({
 				user: req.session.user,
 				exam: examId,
 				answers: [answer],
 			});
-			userAnswers.save();
+			await userAnswers.save();
 		} else {
-			userAnswers.answers.push(answer);
-			userAnswers.save();
+			// If user has already answered, find the specific answer and update it
+			const existingAnswerIndex = userAnswers.answers.findIndex(
+				(ans) => ans.question.toString() === answer.question.toString()
+			);
+			if (existingAnswerIndex !== -1) {
+				// Update existing answer
+				userAnswers.answers[existingAnswerIndex] = answer;
+			} else {
+				// Add new answer if not already exists
+				userAnswers.answers.push(answer);
+			}
+			await userAnswers.save();
 		}
 		res.status(200).json({ message: "Answer submitted successfully" });
 	} catch (error) {
@@ -128,6 +156,7 @@ router.post("/:id/answer/submit", async (req, res) => {
 		res.status(500).json({ message: error.message });
 	}
 });
+
 // router.delete("/:id", async (req, res) => {
 // 	try {
 // 		const examId = req.params.id;

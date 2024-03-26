@@ -73,8 +73,8 @@ describe("Exam Endpoint Tests", () => {
 		const res = await testSession.post("/exams/create").send({
 			title: "Test Exam",
 			description: "This is a test exam",
-			startDate: "2024-03-08",
-			duration: 60,
+			startDate: "2024-03-26",
+			duration: 1440,
 			rootHash: "testroot123",
 			secretKey: "testsecret123",
 			questions: questions,
@@ -135,6 +135,68 @@ describe("Exam Endpoint Tests", () => {
 		expect(res.body.message).toEqual("Answer submitted successfully");
 	});
 
+	// test("POST /exams/:id/answer/submit should submit an answer and respond with an error after exam duration has passed", async () => {
+	// 	const questionsRes = await testSession.get(
+	// 		`/exams/${testExamId}/questions`
+	// 	);
+
+	// 	testQuestionId = questionsRes.body[1]._id;
+
+	// 	// jest.advanceTimersByTime(1440 * 60 * 1000 + 1000);
+
+	// 	const res = await testSession
+	// 		.post(`/exams/${testExamId}/answer/submit`)
+	// 		.send({
+	// 			answer: {
+	// 				questionId: testQuestionId,
+	// 				selectedOption: 0,
+	// 			},
+	// 		});
+
+	// 	expect(res.statusCode).toEqual(400);
+	// 	expect(res.body.message).toEqual(
+	// 		"Exam has already ended. You cannot submit answers."
+	// 	);
+	// });
+
+	test("POST /exams/:id/answer/submit should submit an answer and update the answer with status 200", async () => {
+		const answersRes = await testSession.get(
+			`/exams/${testExamId}/answers`
+		);
+		testAnswerId = answersRes.body[0]._id;
+
+		console.log(
+			"Initial Answer: ",
+			answersRes.body[0].answers[0].selectedOption
+		);
+
+		const questionsRes = await testSession.get(
+			`/exams/${testExamId}/questions`
+		);
+
+		testQuestionId = questionsRes.body[0]._id;
+
+		const res = await testSession
+			.post(`/exams/${testExamId}/answer/submit`)
+			.send({
+				answer: {
+					questionId: testQuestionId,
+					selectedOption: 1,
+				},
+			});
+
+		expect(res.statusCode).toEqual(200);
+		expect(res.body.message).toEqual("Answer submitted successfully");
+	});
+
+	// GET /:id/answers endpoint testi
+	test("GET /exams/:id/answers should respond with 200 status code and the answers for the exam", async () => {
+		const res = await testSession.get(`/exams/${testExamId}/answers`);
+		expect(res.statusCode).toEqual(200);
+		expect(res.body).toBeDefined();
+		console.log("Answers: ", res.body);
+	});
+
 	// GET /:id/answers endpoint testi
 	test("GET /exams/:id/answers should respond with 200 status code and the answers for the exam", async () => {
 		const res = await testSession.get(`/exams/${testExamId}/answers`);
@@ -155,6 +217,10 @@ describe("Exam Endpoint Tests", () => {
 		);
 		expect(res.statusCode).toEqual(200);
 		expect(res.body._id).toEqual(testAnswerId);
+		console.log(
+			"Final Answer: ",
+			answersRes.body[0].answers[0].selectedOption
+		);
 	});
 
 	// GET /question/:id endpoint testi
