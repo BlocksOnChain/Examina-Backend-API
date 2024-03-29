@@ -61,15 +61,15 @@ router.post("/create", async (req, res) => {
 		res.status(500).json({ message: err });
 	}
 });
-// router.get("/", async (req, res) => {
-// 	try {
-// 		const exams = await Exam.find();
-// 		res.json(exams);
-// 	} catch (err) {
-// 		console.error(err);
-// 		res.render("error/500");
-// 	}
-// });
+router.get("/", async (req, res) => {
+	try {
+		const exams = await Exam.find();
+		res.json(exams);
+	} catch (err) {
+		console.error(err);
+		res.render("error/500");
+	}
+});
 
 router.get("/:id", async (req, res) => {
 	try {
@@ -78,9 +78,9 @@ router.get("/:id", async (req, res) => {
 			return res.status(404).render("error/404");
 		}
 		res.json(exam);
-		console.log("REQ.PARAMS.ID: ", req.params.id);
-		console.log("EXAM ID: ", exam.id);
-		console.log("EXAMS: ", exam);
+		// console.log("REQ.PARAMS.ID: ", req.params.id);
+		// console.log("EXAM ID: ", exam.id);
+		console.log("EXAM: ", exam);
 	} catch (err) {
 		console.error(err);
 		res.render("error/500");

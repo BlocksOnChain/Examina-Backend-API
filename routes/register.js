@@ -26,13 +26,13 @@ router.post("/", async (req, res) => {
 		publicKey: walletAddress,
 		signature: signture,
 	};
-	// console.log("Data: ", verifyBody.data);
-	// console.log("Public Key: ", verifyBody.publicKey);
-	// console.log("Signature: ", verifyBody.signature);
+	console.log("Data: ", verifyBody.data);
+	console.log("Public Key: ", verifyBody.publicKey);
+	console.log("Signature: ", verifyBody.signature);
 
 	const verifyResult = signerClient.verifyMessage(verifyBody);
 	// console.log("Req.session.token: ", req.session.token);
-	// console.log("Verify Result: ", verifyResult);
+	console.log("Verify Result: ", verifyResult);
 	if (verifyResult && req.session.token) {
 		// Create user if not exists
 		try {

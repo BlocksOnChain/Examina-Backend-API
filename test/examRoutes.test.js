@@ -2,6 +2,7 @@ const request = require("supertest");
 const app = require("../app");
 const Exam = require("../models/Exam");
 const Question = require("../models/Question");
+const Answer = require("../models/Answer");
 const session = require("supertest-session");
 const mongoose = require("mongoose");
 var Client = require("mina-signer");
@@ -60,20 +61,24 @@ describe("Exam Endpoint Tests", () => {
 	afterAll(async () => {
 		await Exam.deleteMany({});
 		await Question.deleteMany({});
+		await Answer.deleteMany({});
 		await mongoose.disconnect();
 		testSession = null;
 	});
 
 	let testExamId;
+	let fakeTestExamId;
 	let testQuestionId;
+	let fakeTestQuestionId;
 	let testAnswerId;
+	let fakeTestAnswerId;
 
 	// Exam oluşturma testi
 	test("POST /exams/create should create a new exam and respond with 200 status code and success message", async () => {
 		const res = await testSession.post("/exams/create").send({
 			title: "Test Exam",
 			description: "This is a test exam",
-			startDate: "2024-03-26",
+			startDate: "2024-03-28",
 			duration: 1440,
 			rootHash: "testroot123",
 			secretKey: "testsecret123",
@@ -84,11 +89,40 @@ describe("Exam Endpoint Tests", () => {
 		testExamId = res.body.newExam._id;
 	});
 
+	test("POST /exams/create should respond with status code 500 due to saving error", async () => {
+		const res = await testSession.post("/exams/create").send({
+			title: "Test Exam",
+			description: "This is a test exam",
+			startDate: "2024-03-26",
+			duration: 1440,
+			rootHash: "testroot123",
+			secretKey: "testsecret123",
+			questions: "questions",
+		});
+		expect(res.statusCode).toEqual(500);
+		// expect(res.body.message).toHaveProperty("type", "Error when saving");
+	});
+
+	// Exam bilgilerini alma testi
+	test("GET /exams should respond with 200 status code and the all exams details", async () => {
+		const res = await testSession.get(`/exams`);
+		expect(res.statusCode).toEqual(200);
+		console.log("Exams: ", res.body);
+	});
+
 	// Exam bilgilerini alma testi
 	test("GET /exams/:id should respond with 200 status code and the exam details", async () => {
 		const res = await testSession.get(`/exams/${testExamId}`);
 		expect(res.statusCode).toEqual(200);
 		expect(res.body._id).toEqual(testExamId);
+	});
+
+	// Exam bilgilerini alma testi
+	test("GET /exams/:id should respond with 404 status code due to wrong exam id", async () => {
+		fakeTestExamId = "6605768c642d1dea4766e07b";
+		console.log("Test Exam Id: ", testExamId);
+		const res = await testSession.get(`/exams/${fakeTestExamId}`);
+		expect(res.statusCode).toEqual(404);
 	});
 
 	// GET /:id/questions endpoint testi
@@ -97,6 +131,12 @@ describe("Exam Endpoint Tests", () => {
 		expect(res.statusCode).toEqual(200);
 		expect(res.body).toBeDefined();
 		console.log("Questions: ", res.body);
+	});
+
+	test("GET /exams/:id/questions should respond with 404 status code due to wrong exam id", async () => {
+		fakeTestExamId = "6605768c642d1dea4766e07b";
+		const res = await testSession.get(`/exams/${fakeTestExamId}/questions`);
+		expect(res.statusCode).toEqual(404);
 	});
 
 	// GET /:id/question/:questionid endpoint testi
@@ -112,6 +152,34 @@ describe("Exam Endpoint Tests", () => {
 		);
 		expect(res.statusCode).toEqual(200);
 		expect(res.body._id).toEqual(testQuestionId);
+	});
+
+	test("GET /exams/:id/question/:questionid should respond with 404 status code due to wrong exam id", async () => {
+		const questionsRes = await testSession.get(
+			`/exams/${testExamId}/questions`
+		);
+
+		testQuestionId = questionsRes.body[0]._id;
+		fakeTestExamId = "6605768c642d1dea4766e07b";
+
+		const res = await testSession.get(
+			`/exams/${fakeTestExamId}/question/${testQuestionId}`
+		);
+		expect(res.statusCode).toEqual(404);
+	});
+
+	test("GET /exams/:id/question/:questionid should respond with 404 status code due to wrong question id", async () => {
+		const questionsRes = await testSession.get(
+			`/exams/${testExamId}/questions`
+		);
+
+		testQuestionId = questionsRes.body[0]._id;
+		fakeQuestionExamId = "6605768c642d1dea4766e07b";
+
+		const res = await testSession.get(
+			`/exams/${testExamId}/question/${fakeQuestionExamId}`
+		);
+		expect(res.statusCode).toEqual(404);
 	});
 
 	// Answer gönderme testi
@@ -133,6 +201,27 @@ describe("Exam Endpoint Tests", () => {
 
 		expect(res.statusCode).toEqual(200);
 		expect(res.body.message).toEqual("Answer submitted successfully");
+	});
+
+	test("POST /exams/:id/answer/submit should respond with 500 status code due to wrong exam id", async () => {
+		const questionsRes = await testSession.get(
+			`/exams/${testExamId}/questions`
+		);
+
+		testQuestionId = questionsRes.body[0]._id;
+		fakeTestExamId = "6605768c642d1dea4766e07b";
+
+		const res = await testSession
+			.post(`/exams/${fakeTestExamId}/answer/submit`)
+			.send({
+				answer: {
+					questionId: testQuestionId,
+					selectedOption: 0,
+				},
+			});
+
+		expect(res.statusCode).toEqual(500);
+		expect(res.body.message).toEqual("Exam not found");
 	});
 
 	// test("POST /exams/:id/answer/submit should submit an answer and respond with an error after exam duration has passed", async () => {
@@ -197,12 +286,10 @@ describe("Exam Endpoint Tests", () => {
 		console.log("Answers: ", res.body);
 	});
 
-	// GET /:id/answers endpoint testi
-	test("GET /exams/:id/answers should respond with 200 status code and the answers for the exam", async () => {
-		const res = await testSession.get(`/exams/${testExamId}/answers`);
-		expect(res.statusCode).toEqual(200);
-		expect(res.body).toBeDefined();
-		console.log("Answers: ", res.body);
+	test("GET /exams/:id/answers should respond with 404 status code due to wrong exam id", async () => {
+		fakeTestExamId = "6605768c642d1dea4766e07b";
+		const res = await testSession.get(`/exams/${fakeTestExamId}/answers`);
+		expect(res.statusCode).toEqual(404);
 	});
 
 	// GET /:id/answers/:answerid endpoint testi
@@ -223,6 +310,19 @@ describe("Exam Endpoint Tests", () => {
 		);
 	});
 
+	test("GET /exams/:id/answers/:answerid should respond with 404 status code due to wrong exam id", async () => {
+		const answersRes = await testSession.get(
+			`/exams/${testExamId}/answers`
+		);
+		testAnswerId = answersRes.body[0]._id;
+
+		fakeTestExamId = "6605768c642d1dea4766e07b";
+		const res = await testSession.get(
+			`/exams/${fakeTestExamId}/answers/${testAnswerId}`
+		);
+		expect(res.statusCode).toEqual(404);
+	});
+
 	// GET /question/:id endpoint testi
 	test("GET /exams/question/:id should respond with 200 status code and the details of a specific question", async () => {
 		const questionsRes = await testSession.get(
@@ -234,5 +334,19 @@ describe("Exam Endpoint Tests", () => {
 		const res = await testSession.get(`/exams/question/${testQuestionId}`);
 		expect(res.statusCode).toEqual(200);
 		expect(res.body._id).toEqual(testQuestionId);
+	});
+
+	test("GET /exams/question/:id should respond with 404 status code due to wrong question id", async () => {
+		const questionsRes = await testSession.get(
+			`/exams/${testExamId}/questions`
+		);
+
+		testQuestionId = questionsRes.body[0]._id;
+
+		fakeTestQuestionId = "6605768c642d1dea4766e07b";
+		const res = await testSession.get(
+			`/exams/question/${fakeTestQuestionId}`
+		);
+		expect(res.statusCode).toEqual(404);
 	});
 });
