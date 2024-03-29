@@ -178,14 +178,19 @@ describe("Register Endpoint Tests", () => {
 		}
 		console.log("Real Signature: ", realSignResult);
 
-		const isEqual = realSignResult.signature == signResult.signature;
+		const isEqual = realSignResult.signature === signResult.signature;
 
 		console.log("Is equal: ", isEqual);
+
+		fakeOgluFakeSignature = {
+			field: "20187308472959499197282132002348634947237350735045384676982170768323707710782",
+			scalar: "865103642786804350208844285909586573108974998309200978991283948435663799274",
+		};
 
 		const verifyBody = {
 			data: realSignParams,
 			publicKey: keys_demo.publicKey,
-			signature: signResult.signature,
+			signature: fakeOgluFakeSignature,
 		};
 		console.log("Verify Body: ", verifyBody);
 
@@ -195,7 +200,7 @@ describe("Register Endpoint Tests", () => {
 		// send the message to endpoint to verify
 		const res = await testSession.post("/register").send({
 			walletAddress: signResult.publicKey,
-			signature: JSON.parse(JSON.stringify(signResult.signature)),
+			signature: JSON.parse(JSON.stringify(fakeOgluFakeSignature)),
 		});
 
 		expect(res.status).toBe(401);
