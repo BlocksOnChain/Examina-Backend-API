@@ -1,8 +1,8 @@
-const mongoose = require("mongoose");
+import { Schema, model } from "mongoose";
 
-const ExamSchema = new mongoose.Schema({
+export const ExamSchema = new Schema({
 	creator: {
-		type: mongoose.Schema.Types.ObjectId,
+		type: Schema.Types.ObjectId,
 		required: true,
 		ref: "User",
 	},
@@ -37,4 +37,4 @@ const ExamSchema = new mongoose.Schema({
 	},
 }, autoCreate = true);
 
-module.exports = mongoose.model("Exam", ExamSchema);
+export default model("Exam", ExamSchema);

@@ -1,19 +1,19 @@
-const mongoose = require("mongoose");
+import { Schema, model } from "mongoose";
 
-const userAnswerSchema = new mongoose.Schema({
+const userAnswerSchema = new Schema({
     user: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'User',
         required: true,
     },
     exam: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'Exam',
         required: true,
     },
     answers: [{
         question: {
-            type: mongoose.Schema.Types.ObjectId,
+            type: Schema.Types.ObjectId,
             ref: 'Question',
             required: true,
         },
@@ -29,4 +29,4 @@ const userAnswerSchema = new mongoose.Schema({
 }, autoCreate = true,
 );
 
-module.exports = mongoose.model("Answer", userAnswerSchema);
+export default model("Answer", userAnswerSchema);

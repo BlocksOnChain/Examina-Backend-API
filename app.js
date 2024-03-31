@@ -1,15 +1,21 @@
-const express = require("express");
-const dotenv = require("dotenv");
-var cors = require("cors");
-const morgan = require("morgan");
-const exphbs = require("express-handlebars");
-const connectDB = require("./config/db");
-const compression = require("compression");
-const path = require("path");
-const session = require("express-session");
-const MemoryStore = require("memorystore")(session);
-
-dotenv.config({ path: "./config/config.env" });
+import express from "express";
+import { config } from "dotenv";
+import cors from "cors";
+import morgan from "morgan";
+import { engine } from "express-handlebars";
+import connectDB from "./config/db.js";
+import compression from "compression";
+import session from "express-session";
+import pkg from 'memorystore';
+import index from "./routes/index.js"
+import * as exams from "./routes/exams.js";
+import register from "./routes/register.js"
+import login from "./routes/login.js"
+import classroom from "./routes/classroom.js"
+import user from "./routes/user.js"
+import questions from "./routes/questions.js"
+const { session: _session } = pkg;
+config({ path: "./config/config.env" });
 
 connectDB();
 
@@ -17,7 +23,6 @@ const app = express();
 
 app.use(compression());
 
-app.use(express.static(path.join(__dirname, "public")));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -47,7 +52,7 @@ if (app.get("env") === "production") {
 	);
 }
 
-sess.store = new MemoryStore({
+sess.store = new session.MemoryStore({
 	checkPeriod: 86400000, // prune expired entries every 24h
 });
 
@@ -56,16 +61,16 @@ if (process.env.NODE_ENV === "development") {
 	app.use(morgan("dev"));
 }
 
-app.engine(".hbs", exphbs.engine({ defaultLayout: "main", extname: ".hbs" }));
+app.engine(".hbs", engine({ defaultLayout: "main", extname: ".hbs" }));
 app.set("view engine", ".hbs");
 
-app.use("/", require("./routes/index"));
-app.use("/exams", require("./routes/exams"));
-app.use("/register", require("./routes/register"));
-app.use("/login", require("./routes/login"));
-app.use("/classroom", require("./routes/classroom"));
-app.use("/user", require("./routes/user"));
-app.use("/questions", require("./routes/questions"));
+app.use("/", index);
+app.use("/exams", exams);
+app.use("/register", register);
+app.use("/login", login);
+app.use("/classroom", classroom);
+app.use("/user", user);
+app.use("/questions", questions);
 
 const PORT = process.env.PORT || 5000;
 app.listen(
@@ -75,4 +80,4 @@ app.listen(
 	)
 );
 
-module.exports = app;
+export default app;

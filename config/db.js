@@ -1,10 +1,10 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const connectDB = async () => {
 	try {
 		await mongoose.connect(process.env.MONGO_URI, {});
 
-		const db = mongoose.connection.db;
+		const db = connection.db;
 
 		if (!db) {
 			console.error("Failed to get MongoDB database.");
@@ -12,7 +12,7 @@ const connectDB = async () => {
 		}
 
 		console.log(
-			`MongoDB connected to ${mongoose.connection.host} with url: ${process.env.MONGO_URI}`
+			`MongoDB connected to ${connection.host} with url: ${process.env.MONGO_URI}`
 		);
 
 		// Koleksiyonları kontrol et ve gerekiyorsa oluştur
@@ -36,4 +36,4 @@ const connectDB = async () => {
 	}
 };
 
-module.exports = connectDB;
+export default connectDB;

@@ -1,9 +1,9 @@
 const request = require("supertest");
-const app = require("../app");
+const app = require("../app").default;
 const mongoose = require("mongoose");
 var Client = require("mina-signer");
 const session = require("supertest-session");
-const User = require("../models/User");
+const User = require("../models/User").default;
 // mainnet or testnet
 const signerClient = new Client({ network: "testnet" });
 

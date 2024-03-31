@@ -1,7 +1,7 @@
-const express = require("express");
-const router = express.Router();
-const User = require("../models/User");
-var Client = require("mina-signer");
+import { Router } from "express";
+const router = Router();
+import User, { find } from "../models/User";
+import Client from "mina-signer";
 // mainnet or testnet
 const signerClient = new Client({ network: "testnet" });
 
@@ -36,7 +36,7 @@ router.post("/", async (req, res) => {
 	if (verifyResult && req.session.token) {
 		// Create user if not exists
 		try {
-			const user = await User.find({ walletAddress: walletAddress });
+			const user = await find({ walletAddress: walletAddress });
 			if (user.length == 0) {
 				const newUser = new User({
 					username: walletAddress,
@@ -66,4 +66,4 @@ router.get("/session", (req, res) => {
 	res.json({ user: req.session.token });
 });
 
-module.exports = router;
+export default router;

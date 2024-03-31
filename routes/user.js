@@ -1,9 +1,9 @@
-const express = require("express");
-const router = express.Router();
-const User = require("../models/User");//Generate user route for get all users
+import { Router } from "express";
+const router = Router();
+import { find } from "../models/User";//Generate user route for get all users
 router.get("/", async (req, res) => {
     try {
-        const users = await User.find();
+        const users = await find();
         res.json(users);
     } catch (err) {
         console.error(err);
@@ -11,4 +11,4 @@ router.get("/", async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

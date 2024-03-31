@@ -1,7 +1,7 @@
-const express = require("express");
-const router = express.Router();
-const Classroom = require("../models/Classroom");
-const isAuthenticated = require("../middleware/auth");
+import { Router } from "express";
+const router = Router();
+import { create, find, findOne, findByIdAndRemove } from "../models/Classroom";
+import isAuthenticated from "../middleware/auth";
 
 router.use((req, res, next) => {
 	isAuthenticated(req, res, next)
@@ -9,7 +9,7 @@ router.use((req, res, next) => {
 router.post("/", async (req, res) => {
 	try {
 		const { name, teacherId, studentIds } = req.body;
-		const classroom = await Classroom.create({
+		const classroom = await create({
 			name,
 			teacher: teacherId,
 			students: studentIds,
@@ -24,7 +24,7 @@ router.post("/", async (req, res) => {
 router.get("/user/:userId", async (req, res) => {
 	try {
 		const userId = req.params.userId;
-		const classrooms = await Classroom.find({ teacher: userId }).populate(
+		const classrooms = await find({ teacher: userId }).populate(
 			"students",
 			"name email"
 		);
@@ -38,7 +38,7 @@ router.get("/user/:userId", async (req, res) => {
 router.get("/student/:studentId", async (req, res) => {
 	try {
 		const studentId = req.params.studentId;
-		const classrooms = await Classroom.find({
+		const classrooms = await find({
 			students: studentId,
 		}).populate("teacher", "name email");
 		res.json(classrooms);
@@ -53,7 +53,7 @@ router.delete("/:classroomId", async (req, res) => {
 		const classroomId = req.params.classroomId;
 		const userId = req.user.id; // Kullanıcı kimliğini al
 
-		const classroom = await Classroom.findOne({
+		const classroom = await findOne({
 			_id: classroomId,
 			teacher: userId,
 		});
@@ -65,7 +65,7 @@ router.delete("/:classroomId", async (req, res) => {
 			});
 		}
 
-		const deletedClassroom = await Classroom.findByIdAndRemove(classroomId);
+		const deletedClassroom = await findByIdAndRemove(classroomId);
 		if (deletedClassroom) {
 			res.json({ message: "Classroom deleted successfully" });
 		} else {
@@ -77,4 +77,4 @@ router.delete("/:classroomId", async (req, res) => {
 	}
 });
 
-module.exports = router;
+export default router;

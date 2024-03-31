@@ -1,12 +1,10 @@
-const express = require("express");
-const Exam = require("../models/Exam");
-const Answer = require("../models/Answer");
-const Question = require("../models/Question");
-const router = express.Router();
+import { Router } from "express";
+import { find } from "../models/Question";
+const router = Router();
 
 router.get("/", async (req, res) => {
 	try {
-		const questions = await Question.find({});
+		const questions = await find({});
 		res.status(200).json(questions);
 	} catch (err) {
 		console.error(err);
@@ -14,4 +12,4 @@ router.get("/", async (req, res) => {
 	}
 });
 
-module.exports = router;
+export default router;

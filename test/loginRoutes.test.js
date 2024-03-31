@@ -1,7 +1,7 @@
 const { expect } = require("chai");
 const supertest = require("supertest");
-const app = require("../app");
-const User = require("../models/User");
+const app = require("../app").default;
+const User = require("../models/User").default;
 
 describe("Login Route", () => {
 	it("should log in a user with valid credentials", async () => {

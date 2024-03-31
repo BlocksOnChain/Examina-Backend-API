@@ -1,6 +1,6 @@
-const express = require("express");
-const router = express.Router();
-const passport = require("passport");
+import { Router } from "express";
+const router = Router();
+import { authenticate } from "passport";
 
 router.get("/login", (req, res) => {
 	res.render("login");
@@ -9,7 +9,7 @@ router.get("/login", (req, res) => {
 router.post(
 	"/login",
 	(req, res, next) => {
-		passport.authenticate("local", (err, user, info) => {
+		authenticate("local", (err, user, info) => {
 			if (err) {
 				console.error(err);
 				return res.status(500).json({ error: err.message });
@@ -34,4 +34,4 @@ router.post(
 	}
 );
 
-module.exports = router;
+export default router;

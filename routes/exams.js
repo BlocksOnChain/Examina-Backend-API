@@ -1,23 +1,23 @@
-const express = require("express");
-const Exam = require("../models/Exam");
-const Answer = require("../models/Answer");
-const Question = require("../models/Question");
-const User = require("../models/User");
-const router = express.Router();
-const crypto = require("crypto");
-const Classroom = require("../models/Classroom");
-const isAuthenticated = require("../middleware/auth");
+import { Router } from "express";
+import Exam, { find, findById } from "../models/Exam";
+import Answer, { findOne, find as _find, findById as _findById } from "../models/Answer";
+import { insertMany, findById as __findById, find as __find } from "../models/Question";
+import { findById as ___findById } from "../models/User";
+export const exams = Router();
+import { createHash } from "crypto";
+import Classroom from "../models/Classroom";
+import isAuthenticated from "../middleware/auth";
 
-router.use((req, res, next) => {
+exams.use((req, res, next) => {
 	isAuthenticated(req, res, next);
 });
-router.get("/create", (req, res) => {
+exams.get("/create", (req, res) => {
 	res.render("exams/create");
 });
 
-router.post("/create", async (req, res) => {
+exams.post("/create", async (req, res) => {
 	try {
-		const user = await User.findById(req.session.user);
+		const user = await ___findById(req.session.user);
 		// console.log("User: ", user._id);
 		if (!user) {
 			return res.status(404).json({ message: "User not found" });
@@ -41,7 +41,7 @@ router.post("/create", async (req, res) => {
 					question.exam = newExam._id;
 					return question;
 				});
-				Question.insertMany(questions)
+				insertMany(questions)
 					.then((result) => {
 						console.log("Insterted many questions", result);
 					})
@@ -61,9 +61,9 @@ router.post("/create", async (req, res) => {
 		res.status(500).json({ message: err });
 	}
 });
-router.get("/", async (req, res) => {
+exams.get("/", async (req, res) => {
 	try {
-		const exams = await Exam.find();
+		const exams = await find();
 		res.json(exams);
 	} catch (err) {
 		console.error(err);
@@ -71,9 +71,9 @@ router.get("/", async (req, res) => {
 	}
 });
 
-router.get("/:id", async (req, res) => {
+exams.get("/:id", async (req, res) => {
 	try {
-		const exam = await Exam.findById(req.params.id);
+		const exam = await findById(req.params.id);
 		if (!exam) {
 			return res.status(404).render("error/404");
 		}
@@ -87,23 +87,22 @@ router.get("/:id", async (req, res) => {
 	}
 });
 
-router.post("/:id/answer/submit", async (req, res) => {
+exams.post("/:id/answer/submit", async (req, res) => {
 	try {
-		const user = await User.findById(req.session.user);
+		const user = await ___findById(req.session.user);
 		const hashInput =
 			user.walletAddress + JSON.stringify(req.body.answer.selectedOption);
-		const answerHash = crypto
-			.createHash("sha256")
+		const answerHash = createHash("sha256")
 			.update(hashInput)
 			.digest("hex");
-		const question = await Question.findById(req.body.answer.questionId);
+		const question = await __findById(req.body.answer.questionId);
 		const answer = {
 			question: question._id,
 			selectedOption: req.body.answer.selectedOption,
 			answerHash: answerHash,
 		};
 		const examId = req.params.id;
-		const exam = await Exam.findById(examId);
+		const exam = await findById(examId);
 
 		if (!exam) {
 			return res.status(500).json({ message: "Exam not found" });
@@ -123,7 +122,7 @@ router.post("/:id/answer/submit", async (req, res) => {
 		}
 
 		// Find answers by user inside Answer schema
-		let userAnswers = await Answer.findOne({
+		let userAnswers = await findOne({
 			user: user._id,
 			exam: examId,
 		});
@@ -157,7 +156,7 @@ router.post("/:id/answer/submit", async (req, res) => {
 	}
 });
 
-// router.delete("/:id", async (req, res) => {
+// exams.delete("/:id", async (req, res) => {
 // 	try {
 // 		const examId = req.params.id;
 // 		const userId = req.user._id;
@@ -180,13 +179,13 @@ router.post("/:id/answer/submit", async (req, res) => {
 // 	}
 // });
 
-router.get("/:id/question/:questionid", async (req, res) => {
+exams.get("/:id/question/:questionid", async (req, res) => {
 	try {
-		const exam = await Exam.findById(req.params.id);
+		const exam = await findById(req.params.id);
 		if (!exam) {
 			return res.status(404).send("exam not found");
 		}
-		const question = await Question.findById(req.params.questionid);
+		const question = await __findById(req.params.questionid);
 		if (!question) {
 			return res.status(404).send("question not found");
 		}
@@ -197,13 +196,13 @@ router.get("/:id/question/:questionid", async (req, res) => {
 	}
 });
 
-router.get("/:id/questions", async (req, res) => {
+exams.get("/:id/questions", async (req, res) => {
 	try {
-		const exam = await Exam.findById(req.params.id);
+		const exam = await findById(req.params.id);
 		if (!exam) {
 			return res.status(404).send("exam not found");
 		}
-		const questions = await Question.find({ exam: exam._id });
+		const questions = await __find({ exam: exam._id });
 		res.json(questions);
 	} catch (err) {
 		console.error(err);
@@ -211,13 +210,13 @@ router.get("/:id/questions", async (req, res) => {
 	}
 });
 
-router.get("/:id/answers", async (req, res) => {
+exams.get("/:id/answers", async (req, res) => {
 	try {
-		const exam = await Exam.findById(req.params.id);
+		const exam = await findById(req.params.id);
 		if (!exam) {
 			return res.status(404).send("exam not found");
 		}
-		const answers = await Answer.find({
+		const answers = await _find({
 			user: req.session.user,
 			exam: exam._id,
 		}).populate("answers");
@@ -228,13 +227,13 @@ router.get("/:id/answers", async (req, res) => {
 	}
 });
 
-router.get("/:id/answers/:answerid", async (req, res) => {
+exams.get("/:id/answers/:answerid", async (req, res) => {
 	try {
-		const exam = await Exam.findById(req.params.id);
+		const exam = await findById(req.params.id);
 		if (!exam) {
 			return res.status(404).send("exam not found");
 		}
-		const answer = await Answer.findById(req.params.answerid);
+		const answer = await _findById(req.params.answerid);
 		res.json(answer);
 	} catch (err) {
 		console.error(err);
@@ -242,9 +241,9 @@ router.get("/:id/answers/:answerid", async (req, res) => {
 	}
 });
 
-router.get("/question/:id", async (req, res) => {
+exams.get("/question/:id", async (req, res) => {
 	try {
-		const question = await Question.findById(req.params.id);
+		const question = await __findById(req.params.id);
 		if (!question) {
 			return res.status(404).send("question not found");
 		}
@@ -255,4 +254,4 @@ router.get("/question/:id", async (req, res) => {
 	}
 });
 
-module.exports = router;
+export default exams;
