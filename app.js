@@ -8,6 +8,7 @@ const compression = require("compression");
 const path = require("path");
 const session = require("express-session");
 const MemoryStore = require('memorystore')(session)
+var nodemailer = require('nodemailer');
 
 dotenv.config({ path: "./config/config.env" });
 
@@ -19,11 +20,11 @@ app.use(compression());
 app.use(
 	cors({
 		origin: [
-		"http://localhost:3000/",
-		"https://examina.space",
-		"https://examina.space/",
-		"https://www.examina.space/",
-		"https://www.examina.space"
+			"http://localhost:3000/",
+			"https://examina.space",
+			"https://examina.space/",
+			"https://www.examina.space/",
+			"https://www.examina.space"
 		],
 		credentials: true,
 	})
@@ -62,7 +63,15 @@ app.use("/login", require("./routes/login"));
 app.use("/classroom", require("./routes/classroom"));
 app.use("/user", require("./routes/user"));
 app.use("/questions", require("./routes/questions"));
-
+export const transporter = nodemailer.createTransport({
+	port: 465,               // true for 465, false for other ports
+	host: "smtpout.secureserver.net",
+	auth: {
+		user: 'info@choz.io',
+		pass: `${process.env.MAIL_PASSWORD}`,
+	},
+	secure: true,
+});
 const PORT = process.env.PORT || 5000;
 app.listen(
 	PORT,
