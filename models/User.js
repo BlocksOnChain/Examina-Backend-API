@@ -3,11 +3,11 @@ const passportLocalMongoose = require("passport-local-mongoose");
 
 const userSchema = new mongoose.Schema({
 	email: {
-		type: String
+		type: String,
+		required: true,
 	},
 	walletAddress: {
 		type: String,
-		required: true,
 	},
 });
 
