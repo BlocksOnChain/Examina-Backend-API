@@ -110,7 +110,8 @@ router.post("/:id/answer/submit", async (req, res) => {
 		}
 
 		// Calculate end time of the exam
-		const startTime = new Date(exam.startDate);
+		const startTime = exam.startDate;
+		console.log("Start time: ", startTime);
 		const endTime = new Date(startTime.getTime() + exam.duration * 60000); // Convert duration from minutes to milliseconds
 
 		// Check if the exam has already ended

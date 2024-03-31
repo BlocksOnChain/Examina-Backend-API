@@ -78,7 +78,7 @@ describe("Exam Endpoint Tests", () => {
 		const res = await testSession.post("/exams/create").send({
 			title: "Test Exam",
 			description: "This is a test exam",
-			startDate: "2024-03-28",
+			startDate: new Date(),
 			duration: 1440,
 			rootHash: "testroot123",
 			secretKey: "testsecret123",
@@ -93,7 +93,7 @@ describe("Exam Endpoint Tests", () => {
 		const res = await testSession.post("/exams/create").send({
 			title: "Test Exam",
 			description: "This is a test exam",
-			startDate: "2024-03-26",
+			startDate: new Date(),
 			duration: 1440,
 			rootHash: "testroot123",
 			secretKey: "testsecret123",
