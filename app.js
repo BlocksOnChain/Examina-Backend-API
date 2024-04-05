@@ -63,7 +63,6 @@ app.use("/", require("./routes/index"));
 app.use("/exams", require("./routes/exams"));
 app.use("/register", require("./routes/register"));
 app.use("/login", require("./routes/login"));
-app.use("/classroom", require("./routes/classroom"));
 app.use("/user", require("./routes/user"));
 app.use("/questions", require("./routes/questions"));
 

@@ -3,50 +3,18 @@ const Exam = require("../models/Exam");
 const Answer = require("../models/Answer");
 const Question = require("../models/Question");
 const User = require("../models/User");
+const Score = require("../models/Score");
 const router = express.Router();
 const crypto = require("crypto");
 const Classroom = require("../models/Classroom");
 const isAuthenticated = require("../middleware/auth");
-const { createMockExam } = require("../middleware/protokit");
+const { createMockExam, createExam, publishCorrectAnswers, checkScore } = require("../middleware/protokit");
 const isMochaRunning = require("../middleware/isMochaRunning");
 router.use((req, res, next) => {
 	isAuthenticated(req, res, next);
 });
 router.get("/create", (req, res) => {
 	res.render("exams/create");
-});
-
-router.post("/", async (req, res) => {
-	try {
-		// Check if the logged-in user is a teacher
-		if (req.user.role !== "teacher") {
-			return res.status(403).json({ message: "Unauthorized" });
-		}
-
-		// Check if the logged-in teacher is allowed to create the exam for the given classroom
-		const classroomId = req.body.classroomId;
-		const classroom = await Classroom.findById(classroomId);
-		if (
-			!classroom ||
-			classroom.teacher.toString() !== req.user._id.toString()
-		) {
-			return res.status(403).json({
-				message: "You are not allowed to create exams for this classroom",
-			});
-		}
-
-		await Exam.create(
-			(creator = req.user),
-			(title = req.body.title),
-			(questions = req.body.questions),
-			(rootHash = req.body.rootHash),
-			(contract_address = req.body.contract_address)
-		);
-		res.json({ success: true, message: "Exam created successfully" });
-	} catch (error) {
-		console.log(error);
-		res.render("error/500");
-	}
 });
 
 router.post("/create", async (req, res) => {
@@ -86,6 +54,18 @@ router.post("/create", async (req, res) => {
 					message: "Exam created successfully",
 					newExam: result,
 				});
+				if (isMochaRunning) {
+					createExam(
+						newExam._id,
+						questions.map((q) => {
+							return {
+								question_id: q._id,
+								question: q.text,
+								correctAnswer: q.correctAnswer,
+							};
+						})
+					);
+				}
 			})
 			.catch((err) => {
 				console.log(err);
@@ -126,9 +106,6 @@ router.get("/:id", async (req, res) => {
 			return res.status(404).render("error/404");
 		}
 		res.json(exam);
-		// console.log("REQ.PARAMS.ID: ", req.params.id);
-		// console.log("EXAM ID: ", exam.id);
-		console.log("EXAM: ", exam);
 	} catch (err) {
 		console.error(err);
 		res.render("error/500");
@@ -196,6 +173,26 @@ router.post("/:id/answer/submit", async (req, res) => {
 			} else {
 				// Add new answer if not already exists
 				userAnswers.answers.push(answer);
+				const questions = await Question.find({ exam: exam._id });
+				if(userAnswers.answers.length == questions.length){
+					publishCorrectAnswers(examId, questions.map((q) => {
+						return {
+							question_id: q._id,
+							question: q.text,
+							correctAnswer: q.correctAnswer,
+						};
+					}));
+					exam.isCompleted = true;
+					await exam.save();
+					const score = checkScore(examId, user._id);
+					console.log("Score: ", score)
+					const userScore = new Score({
+						user: user._id,
+						exam: examId,
+						score: score,
+					});
+					await userScore.save();
+				}
 			}
 			await userAnswers.save();
 		}
@@ -300,8 +297,19 @@ router.get("/question/:id", async (req, res) => {
 		res.json(question);
 	} catch (err) {
 		console.error(err);
-		res.render("error/500");
+		res.status(500).json("error finding question");
 	}
 });
+
+router.get("/scores/:examID", async (req, res) => {
+	try {
+		const scores = await Score.find({ exam: req.params.examID });
+		res.json(scores);
+	} catch (err) {
+		console.error(err);
+		res.status(500).json("error finding scores");
+	}
+}
+);
 
 module.exports = router;
