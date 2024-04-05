@@ -6,6 +6,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - 5000:5000
+    networks:
+      - examina_network
     depends_on:
       - db
     environment:
@@ -18,5 +20,12 @@ services:
       - 27017:27017
     volumes:
       - mongodb_data:/data/db
+    networks: 
+      - examina_network
 volumes:
   mongodb_data: 
+
+networks:
+  examina_network:
+    driver: bridge
+    external: true

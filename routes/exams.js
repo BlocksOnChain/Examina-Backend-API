@@ -7,7 +7,8 @@ const router = express.Router();
 const crypto = require("crypto");
 const Classroom = require("../models/Classroom");
 const isAuthenticated = require("../middleware/auth");
-
+const { createMockExam } = require("../middleware/protokit")
+const isMochaRunning = require("../middleware/isMochaRunning");
 router.use((req, res, next) => {
 	isAuthenticated(req, res, next)
 })
@@ -87,6 +88,17 @@ router.get("/", async (req, res) => {
 	} catch (err) {
 		console.error(err);
 		res.render("error/500");
+	}
+});
+
+router.post("/create/mock_exam", async (req, res) => {
+	try {
+		console.log("isMochaRunning: ", isMochaRunning);
+		const result = await fetch(`${process.env.PROTOKIT_URL}/create/mock_exam`);
+		res.json(result.json());
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ message: "Internal Server Error" });
 	}
 });
 
