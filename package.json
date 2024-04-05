@@ -2,11 +2,11 @@
 	"name": "examina",
 	"version": "1.0.0",
 	"description": "examina backend api",
-	"main": "app.js",
+	"main": "server.js",
 	"scripts": {
-		"start": "cross-env NODE_ENV=production node app",
-		"dev": "cross-env NODE_ENV=development nodemon app",
-		"test": "jest"
+		"start": "cross-env NODE_ENV=production node server",
+		"dev": "cross-env NODE_ENV=development nodemon server",
+		"test": "jest --detectOpenHandles --forceExit --maxWorkers=1"
 	},
 	"author": "Lruquaf",
 	"license": "MIT",

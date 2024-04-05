@@ -12,9 +12,6 @@ describe("Register Endpoint Tests", () => {
 	beforeEach(() => {
 		testSession = session(app); // Test oturumu oluşturduk
 	});
-	beforeAll(async () => {
-		await mongoose.connect(process.env.MONGO_URI, {});
-	});
 	afterAll(async () => {
 		await User.deleteMany({});
 		await mongoose.disconnect();

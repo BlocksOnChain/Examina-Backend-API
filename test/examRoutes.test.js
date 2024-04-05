@@ -55,9 +55,6 @@ describe("Exam Endpoint Tests", () => {
 			signature: JSON.parse(JSON.stringify(signResult.signature)),
 		});
 	});
-	beforeAll(async () => {
-		await mongoose.connect(process.env.MONGO_URI, {});
-	});
 	afterAll(async () => {
 		await Exam.deleteMany({});
 		await Question.deleteMany({});
