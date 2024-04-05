@@ -1,13 +1,13 @@
 const express = require("express");
 const dotenv = require("dotenv");
-var cors = require('cors');
+var cors = require("cors");
 const morgan = require("morgan");
 const exphbs = require("express-handlebars");
 const connectDB = require("./config/db");
 const compression = require("compression");
 const path = require("path");
 const session = require("express-session");
-const MemoryStore = require('memorystore')(session)
+const MemoryStore = require("memorystore")(session);
 
 dotenv.config({ path: "./config/config.env" });
 
@@ -16,38 +16,42 @@ connectDB();
 const app = express();
 
 app.use(compression());
-app.use(
-	cors({
-		origin: [
-		"http://localhost:3000/",
-		"https://examina.space",
-		"https://examina.space/",
-		"https://www.examina.space/",
-		"https://www.examina.space"
-		],
-		credentials: true,
-	})
-);
 
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 var sess = {
-	secret: 'examina the best',
-	cookie: {},
+	secret: "examina the best",
+	cookie: { secure: false },
 	resave: false,
-	saveUninitialized: true
-}
+	saveUninitialized: true,
+};
 
-if (app.get('env') === 'production') {
-	app.set('trust proxy', 1) // trust first proxy
+if (app.get("env") === "production") {
+	app.set("trust proxy", 1); // trust first proxy
 	sess.store = new MemoryStore({
-		checkPeriod: 86400000 // prune expired entries every 24h
-	})
+		checkPeriod: 86400000, // prune expired entries every 24h
+	});
+	app.use(
+		cors({
+			origin: [
+				"http://localhost:3000/",
+				"https://examina.space",
+				"https://examina.space/",
+				"https://www.examina.space/",
+				"https://www.examina.space",
+			],
+			credentials: true,
+		})
+	);
 }
 
-app.use(session(sess))
+sess.store = new MemoryStore({
+	checkPeriod: 86400000, // prune expired entries every 24h
+});
+
+app.use(session(sess));
 if (process.env.NODE_ENV === "development") {
 	app.use(morgan("dev"));
 }
@@ -70,3 +74,5 @@ app.listen(
 		`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`
 	)
 );
+
+module.exports = app;
