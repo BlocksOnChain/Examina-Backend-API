@@ -1,6 +1,6 @@
 const createExam = (examID, questions) => {
   if(isMochaRunning() == true) return;
-  const url = 'http://process.env.PROTOKIT_URL/create/exam';
+  const url = `http://${process.env.PROTOKIT_URL}/create/exam`;
 
   // Data to be sent in the POST request (can be JSON, FormData, etc.)
   const postData = {
@@ -35,7 +35,7 @@ const createExam = (examID, questions) => {
 
 const submitAnswer = (examID, userID, questionID, userAnswer) => {
   if(isMochaRunning() == true) return;
-  const url = 'http://process.env.PROTOKIT_URL/submit-user-answer';
+  const url = `http://${process.env.PROTOKIT_URL}/submit-user-answer`;
 
   // Data to be sent in the POST request (can be JSON, FormData, etc.)
   const postData = {
@@ -72,7 +72,7 @@ const submitAnswer = (examID, userID, questionID, userAnswer) => {
 
 const publishCorrectAnswers = (examID, questionsWithCorrectAnswers) => {
   if(isMochaRunning() == true) return;
-  const url = 'http://process.env.PROTOKIT_URL/publish-correct-answers';
+  const url = `http://${process.env.PROTOKIT_URL}/publish-correct-answers`;
 
   // Data to be sent in the POST request (can be JSON, FormData, etc.)
   const postData = {
@@ -107,7 +107,7 @@ const publishCorrectAnswers = (examID, questionsWithCorrectAnswers) => {
 
 const checkScore = (examID, userID) => {
   if(isMochaRunning() == true) return 3;
-  const url = 'http://process.env.PROTOKIT_URL/check-score';
+  const url = `http://${process.env.PROTOKIT_URL}/check-score`;
 
   // Data to be sent in the POST request (can be JSON, FormData, etc.)
   const postData = {
