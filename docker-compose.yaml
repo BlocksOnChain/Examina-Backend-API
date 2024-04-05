@@ -6,11 +6,14 @@ services:
       dockerfile: Dockerfile
     ports:
       - 5000:5000
+    networks:
+      - examina_network
     depends_on:
       - db
     environment:
       MONGO_URI: mongodb://db:27017
       PORT: 5000
+      PROTOKIT_URL: http://examina-protokit-api_server-1:3000
   db:
     container_name: db
     image: mongo:latest
@@ -18,5 +21,12 @@ services:
       - 27017:27017
     volumes:
       - mongodb_data:/data/db
+    networks: 
+      - examina_network
 volumes:
   mongodb_data: 
+
+networks:
+  examina_network:
+    driver: bridge
+    external: true
