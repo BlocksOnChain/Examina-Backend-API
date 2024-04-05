@@ -13,6 +13,7 @@ services:
     environment:
       MONGO_URI: mongodb://db:27017
       PORT: 5000
+      PROTOKIT_URL: http://examina-protokit-api_server-1:3000
   db:
     container_name: db
     image: mongo:latest
