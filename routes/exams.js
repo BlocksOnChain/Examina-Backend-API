@@ -87,12 +87,13 @@ router.get("/", async (req, res) => {
 
 router.post("/create/mock_exam", async (req, res) => {
 	try {
-		if (isMochaRunning) {
+		if (!isMochaRunning) {
 			const result = await fetch(
 				`${process.env.PROTOKIT_URL}/create/mock_exam`
 			);
+			console.log("Result: ", result);
+			res.json(result);
 		}
-		res.json(result.json());
 	} catch (error) {
 		console.error(error);
 		res.status(500).json({ message: "Internal Server Error" });
