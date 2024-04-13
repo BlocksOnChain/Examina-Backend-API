@@ -8,7 +8,12 @@ const router = express.Router();
 const crypto = require("crypto");
 const Classroom = require("../models/Classroom");
 const isAuthenticated = require("../middleware/auth");
-const { createMockExam, createExam, publishCorrectAnswers, checkScore } = require("../middleware/protokit");
+const {
+	createMockExam,
+	createExam,
+	publishCorrectAnswers,
+	checkScore,
+} = require("../middleware/protokit");
 const isMochaRunning = require("../middleware/isMochaRunning");
 router.use((req, res, next) => {
 	isAuthenticated(req, res, next);
@@ -175,18 +180,21 @@ router.post("/:id/answer/submit", async (req, res) => {
 				// Add new answer if not already exists
 				userAnswers.answers.push(answer);
 				const questions = await Question.find({ exam: exam._id });
-				if(userAnswers.answers.length == questions.length){
-					publishCorrectAnswers(examId, questions.map((q) => {
-						return {
-							question_id: q._id,
-							question: q.text,
-							correctAnswer: q.correctAnswer,
-						};
-					}));
+				if (userAnswers.answers.length == questions.length) {
+					publishCorrectAnswers(
+						examId,
+						questions.map((q) => {
+							return {
+								question_id: q._id,
+								question: q.text,
+								correctAnswer: q.correctAnswer,
+							};
+						})
+					);
 					exam.isCompleted = true;
 					await exam.save();
 					const score = checkScore(examId, user._id);
-					console.log("Score: ", score)
+					console.log("Score: ", score);
 					const userScore = new Score({
 						user: user._id,
 						exam: examId,
@@ -304,13 +312,56 @@ router.get("/question/:id", async (req, res) => {
 
 router.get("/scores/:examID", async (req, res) => {
 	try {
-		const scores = await Score.find({ exam: req.params.examID });
-		res.json(scores);
+		const user = await User.findById(req.session.user);
+		if (!user) {
+			return res.status(401).json("Unauthorized");
+		}
+		const userId = user._id;
+		const examID = req.params.examID;
+
+		const exam = await Exam.findById(examID);
+		if (!exam) {
+			return res.status(404).json("Exam not found");
+		}
+
+		const creatorId = exam.creator.toString();
+		if (userId === creatorId) {
+			const scores = await Score.find({ exam: examID });
+			return res.json(scores);
+		} else {
+			return res.status(403).json("Unauthorized access");
+		}
 	} catch (err) {
 		console.error(err);
-		res.status(500).json("error finding scores");
+		res.status(500).json("Error finding scores");
 	}
-}
-);
+});
+
+router.get("/scores/get_user_score/:examID", async (req, res) => {
+	try {
+		const user = await User.findById(req.session.user);
+		if (!user) {
+			return res.status(401).json("Unauthorized");
+		}
+
+		const userId = user._id;
+		const examID = req.params.examID;
+
+		const exam = await Exam.findById(examID);
+		if (!exam) {
+			return res.status(404).json("Exam not found");
+		}
+
+		const score = await Score.findOne({ exam: examID, user: userId });
+		if (!score) {
+			return res.status(404).json("Score not found for this user");
+		}
+
+		res.json(score);
+	} catch (err) {
+		console.error(err);
+		res.status(500).json("Error finding user score");
+	}
+});
 
 module.exports = router;
