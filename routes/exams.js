@@ -185,7 +185,8 @@ router.post("/:id/answer/submit", async (req, res) => {
 				submitAnswer(examId, user._id, question._id, answer.selectedOption);
 				console.log("User answers: ", userAnswers.answers ? userAnswers.answers : "Undefined");
 				console.log("Exam questions: ", exam.questions ? exam.questions : "Undefined");
-				if (userAnswers.answers?.length == exam.questions?.length) {
+				const questions = await Question.find({ exam: exam._id });
+				if (userAnswers.answers?.length == questions?.length) {
 					const score = checkScore(exam._id, user._id);
 					console.log("Score: ", score);
 					const userScore = new Score({
