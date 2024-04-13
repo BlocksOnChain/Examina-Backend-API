@@ -22,38 +22,39 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 var sess = {
-	secret: "examina the best",
-	cookie: { secure: false },
-	resave: false,
-	saveUninitialized: true,
+  secret: "examina the best",
+  cookie: { secure: false },
+  resave: false,
+  saveUninitialized: true,
 };
 
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3001",
+      "https://examina.space",
+      "https://examina.space/",
+      "https://www.examina.space/",
+      "https://www.examina.space",
+    ],
+    credentials: true,
+  })
+);
+
 if (app.get("env") === "production") {
-	app.set("trust proxy", 1); // trust first proxy
-	sess.store = new MemoryStore({
-		checkPeriod: 86400000, // prune expired entries every 24h
-	});
-	app.use(
-		cors({
-			origin: [
-				"http://localhost:3000/",
-				"https://examina.space",
-				"https://examina.space/",
-				"https://www.examina.space/",
-				"https://www.examina.space",
-			],
-			credentials: true,
-		})
-	);
+  app.set("trust proxy", 1); // trust first proxy
+  sess.store = new MemoryStore({
+    checkPeriod: 86400000, // prune expired entries every 24h
+  });
 }
 
 sess.store = new MemoryStore({
-	checkPeriod: 86400000, // prune expired entries every 24h
+  checkPeriod: 86400000, // prune expired entries every 24h
 });
 
 app.use(session(sess));
 if (process.env.NODE_ENV === "development") {
-	app.use(morgan("dev"));
+  app.use(morgan("dev"));
 }
 
 app.engine(".hbs", exphbs.engine({ defaultLayout: "main", extname: ".hbs" }));
