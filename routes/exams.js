@@ -179,13 +179,24 @@ router.post("/:id/answer/submit", async (req, res) => {
 				userAnswers.answers[existingAnswerIndex] = answer;
 				console.log("Existed answer");
 				submitAnswer(examId, user._id, question._id, answer.selectedOption);
+				const questions = await Question.find({ exam: exam._id });
+				if (userAnswers.answers?.length == questions?.length) {
+					const score = checkScore(exam._id, user._id);
+					console.log("Score: ", score);
+					const userScore = new Score({
+						user: user._id,
+						exam: exam._id,
+						score: score.score,
+					});
+					await userScore.save();
+				}
 			} else {
 				// Add new answer if not already exists
 				userAnswers.answers.push(answer);
 				submitAnswer(examId, user._id, question._id, answer.selectedOption);
-				console.log("User answers: ", userAnswers.answers ? userAnswers.answers : "Undefined");
-				console.log("Exam questions: ", exam.questions ? exam.questions : "Undefined");
+				console.log("User answers: ", userAnswers.answers ? userAnswers.answers.length : "Undefined");
 				const questions = await Question.find({ exam: exam._id });
+				console.log("Questions: ", questions.length ? questions.length : "Undefined");
 				if (userAnswers.answers?.length == questions?.length) {
 					const score = checkScore(exam._id, user._id);
 					console.log("Score: ", score);
