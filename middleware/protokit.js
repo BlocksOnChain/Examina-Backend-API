@@ -132,7 +132,7 @@ const checkScore = (examID, userID) => {
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-      return response.json(); // Parsing JSON response
+      return response.json().score; // Parsing JSON response
     })
     .then(data => {
       console.log('Success:', data);

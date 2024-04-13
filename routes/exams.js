@@ -144,7 +144,7 @@ router.post("/:id/answer/submit", async (req, res) => {
 		// Check if the exam has already ended
 		const currentDateTime = new Date();
 
-		if (currentDateTime > endTime) {
+		if (currentDateTime > endTime + 60000) {
 			return res.status(400).json({
 				message: "Exam has already ended. You cannot submit answers.",
 			});
@@ -176,6 +176,16 @@ router.post("/:id/answer/submit", async (req, res) => {
 			} else {
 				// Add new answer if not already exists
 				userAnswers.answers.push(answer);
+				if (userAnswers.answers.length == exam.questions.length) {
+					const score = checkScore(exam._id, user._id);
+					console.log("Score: ", score);
+					const userScore = new Score({
+						user: user._id,
+						exam: exam._id,
+						score: score,
+					});
+					await userScore.save();
+				}
 			}
 			await userAnswers.save();
 		}
@@ -186,6 +196,7 @@ router.post("/:id/answer/submit", async (req, res) => {
 	}
 });
 
+/* 
 router.get("/tryEnd", async (req, res) => {
 	try {
 		const exams = await Exam.find({ isCompleted: false });
@@ -227,7 +238,8 @@ router.get("/tryEnd", async (req, res) => {
 		console.log(error);
 		res.status(500).json({ message: error.message });
 	}
-});
+}); */
+
 router.get("/:id/question/:questionid", async (req, res) => {
 	try {
 		const exam = await Exam.findById(req.params.id);

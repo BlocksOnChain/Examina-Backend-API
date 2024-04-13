@@ -11,7 +11,7 @@ router.get("/session/get-message-to-sign/:walletAddress", (req, res) => {
 	// save token to user's session
 	req.session.token = token;
 	const message = `${req.session.token}${walletAddress}`;
-	req.session.message = { message: message };
+	req.session.message = message;
 	// console.log("GET req.session.message: ", req.session.message);
 	res.json({ message: message });
 });
