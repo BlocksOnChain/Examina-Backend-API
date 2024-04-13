@@ -143,7 +143,11 @@ router.post("/:id/answer/submit", async (req, res) => {
 
 		// Check if the exam has already ended
 		const currentDateTime = new Date();
-
+		if(currentDateTime < startTime) {
+			return res.status(400).json({
+				message: "Exam has not started yet. You cannot submit answers.",
+			});
+		}
 		if (currentDateTime > endTime + 60000) {
 			return res.status(400).json({
 				message: "Exam has already ended. You cannot submit answers.",
