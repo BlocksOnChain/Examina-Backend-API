@@ -177,10 +177,15 @@ router.post("/:id/answer/submit", async (req, res) => {
 			if (existingAnswerIndex !== -1) {
 				// Update existing answer
 				userAnswers.answers[existingAnswerIndex] = answer;
+				console.log("Existed answer");
+				submitAnswer(examId, user._id, question._id, answer.selectedOption);
 			} else {
 				// Add new answer if not already exists
 				userAnswers.answers.push(answer);
-				if (userAnswers.answers.length == exam.questions.length) {
+				submitAnswer(examId, user._id, question._id, answer.selectedOption);
+				console.log("User answers: ", userAnswers.answers ? userAnswers.answers : "Undefined");
+				console.log("Exam questions: ", exam.questions ? exam.questions : "Undefined");
+				if (userAnswers.answers?.length == exam.questions?.length) {
 					const score = checkScore(exam._id, user._id);
 					console.log("Score: ", score);
 					const userScore = new Score({
