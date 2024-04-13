@@ -1,12 +1,14 @@
+const isMochaRunning = require("../middleware/isMochaRunning");
 const createExam = (examID, questions) => {
-  if(isMochaRunning() == true) return;
+  if(isMochaRunning) return;
   const url =  `${process.env.PROTOKIT_URL}/create/exam`;
 
   // Data to be sent in the POST request (can be JSON, FormData, etc.)
   const postData = {
-    examID: examID,
+    examID: examID.toString("hex"),
     questions: questions
   };
+  console.log("postData: ", postData);
 
   // Options for the fetch request
   const options = {
@@ -34,14 +36,14 @@ const createExam = (examID, questions) => {
 }
 
 const submitAnswer = (examID, userID, questionID, userAnswer) => {
-  if(isMochaRunning() == true) return;
+  if(isMochaRunning) return;
   const url = `${process.env.PROTOKIT_URL}/submit-user-answer`;
 
   // Data to be sent in the POST request (can be JSON, FormData, etc.)
   const postData = {
-    examID: examID,
-    userID: userID,
-    questionID: questionID,
+    examID: examID.toString("hex"),
+    userID: userID.toString("hex"),
+    questionID: questionID.toString("hex"),
     userAnswer: userAnswer
   };
 
@@ -71,12 +73,12 @@ const submitAnswer = (examID, userID, questionID, userAnswer) => {
 }
 
 const publishCorrectAnswers = (examID, questionsWithCorrectAnswers) => {
-  if(isMochaRunning() == true) return;
+  if(isMochaRunning) return;
   const url = `${process.env.PROTOKIT_URL}/publish-correct-answers`;
 
   // Data to be sent in the POST request (can be JSON, FormData, etc.)
   const postData = {
-    examID: examID,
+    examID: examID.toString("hex"),
     questions: questionsWithCorrectAnswers
   };
 
@@ -106,13 +108,13 @@ const publishCorrectAnswers = (examID, questionsWithCorrectAnswers) => {
 }
 
 const checkScore = (examID, userID) => {
-  if(isMochaRunning() == true) return 3;
+  if(isMochaRunning) return 3;
   const url = `${process.env.PROTOKIT_URL}/check-score`;
 
   // Data to be sent in the POST request (can be JSON, FormData, etc.)
   const postData = {
-    examID: examID,
-    userID: userID
+    examID: examID.toString("hex"),
+    userID: userID.toString("hex"),
   };
 
   // Options for the fetch request
@@ -139,3 +141,5 @@ const checkScore = (examID, userID) => {
       console.error('Error:', error);
     });
 }
+
+module.exports = createExam, submitAnswer, publishCorrectAnswers, checkScore;

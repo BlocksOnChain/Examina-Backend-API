@@ -8,12 +8,10 @@ const router = express.Router();
 const crypto = require("crypto");
 const Classroom = require("../models/Classroom");
 const isAuthenticated = require("../middleware/auth");
-const {
-	createMockExam,
-	createExam,
-	publishCorrectAnswers,
-	checkScore,
-} = require("../middleware/protokit");
+const createExam = require("../middleware/protokit");
+const submitAnswer = require("../middleware/protokit");
+const publishCorrectAnswers = require("../middleware/protokit");
+const checkScore = require("../middleware/protokit");
 const isMochaRunning = require("../middleware/isMochaRunning");
 router.use((req, res, next) => {
 	isAuthenticated(req, res, next);
@@ -44,13 +42,23 @@ router.post("/create", async (req, res) => {
 			.then((result) => {
 				console.log(result);
 				// Add newExam._id to each question in req.body.questions
-				const questions = req.body.questions.map((question) => {
+				let questions = req.body.questions.map((question) => {
 					question.exam = newExam._id;
 					return question;
 				});
 				Question.insertMany(questions)
-					.then((result) => {
+					.then((resultQs) => {
 						console.log("Insterted many questions", result);
+						createExam(
+							newExam._id,
+							resultQs.map((q) => {
+								return {
+									questionID: q._id.toString("hex"),
+									question: q.text,
+									correct_answer: q.correctAnswer,
+								};
+							})
+						);
 					})
 					.catch((err) => {
 						console.log(err);
@@ -59,18 +67,6 @@ router.post("/create", async (req, res) => {
 					message: "Exam created successfully",
 					newExam: result,
 				});
-				if (isMochaRunning) {
-					createExam(
-						newExam._id,
-						questions.map((q) => {
-							return {
-								question_id: q._id,
-								question: q.text,
-								correctAnswer: q.correctAnswer,
-							};
-						})
-					);
-				}
 			})
 			.catch((err) => {
 				console.log(err);
@@ -168,6 +164,7 @@ router.post("/:id/answer/submit", async (req, res) => {
 				answers: [answer],
 			});
 			await userAnswers.save();
+			submitAnswer(examId, user._id, question._id, answer.selectedOption);
 		} else {
 			// If user has already answered, find the specific answer and update it
 			const existingAnswerIndex = userAnswers.answers.findIndex(
@@ -179,29 +176,6 @@ router.post("/:id/answer/submit", async (req, res) => {
 			} else {
 				// Add new answer if not already exists
 				userAnswers.answers.push(answer);
-				const questions = await Question.find({ exam: exam._id });
-				if (userAnswers.answers.length == questions.length) {
-					publishCorrectAnswers(
-						examId,
-						questions.map((q) => {
-							return {
-								question_id: q._id,
-								question: q.text,
-								correctAnswer: q.correctAnswer,
-							};
-						})
-					);
-					exam.isCompleted = true;
-					await exam.save();
-					const score = checkScore(examId, user._id);
-					console.log("Score: ", score);
-					const userScore = new Score({
-						user: user._id,
-						exam: examId,
-						score: score,
-					});
-					await userScore.save();
-				}
 			}
 			await userAnswers.save();
 		}
@@ -212,29 +186,48 @@ router.post("/:id/answer/submit", async (req, res) => {
 	}
 });
 
-// router.delete("/:id", async (req, res) => {
-// 	try {
-// 		const examId = req.params.id;
-// 		const userId = req.user._id;
-
-// 		// Find the exam by ID and check if the logged-in teacher created it
-// 		const exam = await Exam.findOne({ _id: examId, creator: userId });
-// 		if (!exam) {
-// 			return res.status(404).json({
-// 				message:
-// 					"Exam not found or you are not authorized to delete it",
-// 			});
-// 		}
-
-// 		// Delete the exam
-// 		await Exam.findByIdAndDelete(examId);
-// 		res.json({ message: "Exam deleted successfully" });
-// 	} catch (error) {
-// 		console.error(error);
-// 		res.status(500).json({ message: "Internal Server Error" });
-// 	}
-// });
-
+router.get("/tryEnd", async (req, res) => {
+	try {
+		const exams = await Exam.find({ isCompleted: false });
+		if (!exams) {
+			return res.status(404).json({ message: "Exams not found that are not completed" });
+		}
+		exams.forEach(async (exam) => {
+			const startTime = exam.startDate;
+			const endTime = new Date(startTime.getTime() + exam.duration * 60000); // Convert duration from minutes to milliseconds
+			if (new Date() >= endTime) {
+				exam.isCompleted = true;
+				await exam.save();
+				const questions = await Question.find({ exam: exam._id });
+				publishCorrectAnswers(
+					req.params.id,
+					questions.map((q) => {
+						return {
+							question_id: q._id,
+							question: q.text,
+							correctAnswer: q.correctAnswer,
+						};
+					})
+				);
+				const usersJoinedExam = await Answer.find({ exam: req.params.id }).populate("user");
+				usersJoinedExam.foreach(async (user) => {
+					const score = checkScore(exam._id, user._id);
+					console.log("Score: ", score);
+					const userScore = new Score({
+						user: user._id,
+						exam: exam._id,
+						score: score,
+					});
+					await userScore.save();
+				});
+			}
+		});
+		res.status(200).json({ message: "Exam ended successfully" });
+	} catch (error) {
+		console.log(error);
+		res.status(500).json({ message: error.message });
+	}
+});
 router.get("/:id/question/:questionid", async (req, res) => {
 	try {
 		const exam = await Exam.findById(req.params.id);

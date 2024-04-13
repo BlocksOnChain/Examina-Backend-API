@@ -61,6 +61,31 @@ router.post("/", async (req, res) => {
 		});
 	}
 });
+if(process.env.NODE_ENV === "development") {
+	router.post("/dev", async (req, res) => {
+			const { walletAddress } = req.body;
+			// Create user if not exists
+			try {
+				const user = await User.find({ walletAddress: walletAddress });
+				if (user.length == 0) {
+					const newUser = new User({
+						username: walletAddress,
+						walletAddress,
+					});
+					const saved_user = await newUser.save();
+					console.log("Saved user: ", saved_user);
+					req.session.user = saved_user._id;
+					return res.json({ success: true, user: req.session.user });
+				} else {
+					req.session.user = user[0]._id;
+					console.log("User already exists: ", user[0]);
+					return res.json({ success: true, user: req.session.user });
+				}
+			} catch (err) {
+				console.log(err);
+			}
+	});
+}
 
 router.get("/session", (req, res) => {
 	res.json({ user: req.session.token });
