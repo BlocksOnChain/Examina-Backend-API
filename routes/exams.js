@@ -264,6 +264,9 @@ router.get("/:id/question/:questionid", async (req, res) => {
 router.get("/:id/questions", async (req, res) => {
 	try {
 		const exam = await Exam.findById(req.params.id);
+		if(exam.startDate > new Date()) {
+			return res.status(400).json({ message: "Exam has not started yet" });
+		}
 		if (!exam) {
 			return res.status(404).send("exam not found");
 		}
@@ -278,6 +281,9 @@ router.get("/:id/questions", async (req, res) => {
 router.get("/:id/answers", async (req, res) => {
 	try {
 		const exam = await Exam.findById(req.params.id);
+		if(exam.startDate > new Date()) {
+			return res.status(400).json({ message: "Exam has not started yet" });
+		}
 		if (!exam) {
 			return res.status(404).send("exam not found");
 		}
@@ -295,6 +301,9 @@ router.get("/:id/answers", async (req, res) => {
 router.get("/:id/answers/:answerid", async (req, res) => {
 	try {
 		const exam = await Exam.findById(req.params.id);
+		if(exam.startDate > new Date()) {
+			return res.status(400).json({ message: "Exam has not started yet" });
+		}
 		if (!exam) {
 			return res.status(404).send("exam not found");
 		}
@@ -309,6 +318,10 @@ router.get("/:id/answers/:answerid", async (req, res) => {
 router.get("/question/:id", async (req, res) => {
 	try {
 		const question = await Question.findById(req.params.id);
+		const exam = await Exam.findById(question.exam);
+		if(exam.startDate > new Date()) {
+			return res.status(400).json({ message: "Exam has not started yet" });
+		}
 		if (!question) {
 			return res.status(404).send("question not found");
 		}
@@ -329,6 +342,9 @@ router.get("/scores/:examID", async (req, res) => {
 		const examID = req.params.examID;
 
 		const exam = await Exam.findById(examID);
+		if(exam.startDate > new Date()) {
+			return res.status(400).json({ message: "Exam has not started yet" });
+		}
 		if (!exam) {
 			return res.status(404).json("Exam not found");
 		}
