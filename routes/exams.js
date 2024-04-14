@@ -8,11 +8,12 @@ const router = express.Router();
 const crypto = require("crypto");
 const Classroom = require("../models/Classroom");
 const isAuthenticated = require("../middleware/auth");
-const createExam = require("../middleware/protokit");
-const submitAnswer = require("../middleware/protokit");
-const publishCorrectAnswers = require("../middleware/protokit");
-const checkScore = require("../middleware/protokit");
+const {createExam, getUserScore} = require("../middleware/protokit");
+const {submitAnswer} = require("../middleware/protokit");
+const {publishCorrectAnswers} = require("../middleware/protokit");
+const {checkScore} = require("../middleware/protokit");
 const isMochaRunning = require("../middleware/isMochaRunning");
+const { setTimeout } = require("timers");
 router.use((req, res, next) => {
 	isAuthenticated(req, res, next);
 });
@@ -177,12 +178,16 @@ router.post("/:id/answer/submit", async (req, res) => {
 			if (existingAnswerIndex !== -1) {
 				// Update existing answer
 				userAnswers.answers[existingAnswerIndex] = answer;
-				console.log("Existed answer");
+				console.log("Gone into Existed answer");
 				submitAnswer(examId, user._id, question._id, answer.selectedOption);
 				const questions = await Question.find({ exam: exam._id });
 				if (userAnswers.answers?.length == questions?.length) {
-					const score = checkScore(exam._id, user._id);
-					console.log("Score: ", score);
+					const result = checkScore(exam._id, user._id);
+					//setTimeout for 1 second to wait for the answer to be submitted to the blockchain
+					setTimeout(() => {
+						console.log("Delayed for 1 second.");
+					}, "1000");
+					const score = getUserScore(exam._id.toString("hex"), user._id.toString("hex")).score;
 					const userScore = new Score({
 						user: user._id,
 						exam: exam._id,

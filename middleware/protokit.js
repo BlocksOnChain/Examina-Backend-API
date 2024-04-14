@@ -55,7 +55,7 @@ const submitAnswer = (examID, userID, questionID, userAnswer) => {
     },
     body: JSON.stringify(postData) // Convert data to JSON string
   };
-
+  console.log("Submitting answer to protokit", postData)
   // Making the POST request using fetch
   fetch(url, options)
     .then(response => {
@@ -125,6 +125,7 @@ const checkScore = (examID, userID) => {
     },
     body: JSON.stringify(postData) // Convert data to JSON string
   };
+  console.log("Fetching score")
 
   // Making the POST request using fetch
   fetch(url, options)
@@ -132,16 +133,39 @@ const checkScore = (examID, userID) => {
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-      console.log("Response without json: ", response);
-      console.log("Response: ", response.json());
-      return response.json(); // Parsing JSON response
+      response.json().then(
+        data => {
+          console.log("Data here as respose: ", data)
+          return data;
+        }
+      ); // Parsing JSON response
     })
-    .then(data => {
-      console.log('Success:', data);
+    .catch(error => {
+      console.log("Fetch gives error")
+      console.error('Error:', error);
+    });
+}
+
+const getUserScore = (examID, userID) => {
+  if(isMochaRunning) return 3;
+  const url = `${process.env.PROTOKIT_URL}/score/${examID}/${userID}`;
+
+  // Making the POST request using fetch
+  fetch(url)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      response.json().then(
+        data => {
+          console.log("Data here as respose: ", data)
+          return data;
+        }
+      ); // Parsing JSON response
     })
     .catch(error => {
       console.error('Error:', error);
     });
 }
 
-module.exports = createExam, submitAnswer, publishCorrectAnswers, checkScore;
+module.exports = {createExam, submitAnswer, publishCorrectAnswers, checkScore, getUserScore};
