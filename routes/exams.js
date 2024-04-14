@@ -181,8 +181,15 @@ router.post("/:id/answer/submit", async (req, res) => {
 				console.log("Gone into Existed answer");
 				submitAnswer(examId, user._id, question._id, answer.selectedOption);
 				const questions = await Question.find({ exam: exam._id });
+				const questionsWithCorrectAnswers = questions.map((q) => {
+					return {
+						questionID: q._id.toString("hex"),
+						question: q.text,
+						correct_answer: q.correctAnswer,
+					}
+			});
 				if (userAnswers.answers?.length == questions?.length) {
-					const result = checkScore(exam._id, user._id);
+					const result = checkScore(exam._id, user._id, questionsWithCorrectAnswers);
 					//setTimeout for 1 second to wait for the answer to be submitted to the blockchain
 					setTimeout(() => {
 						console.log("Delayed for 1 second.");

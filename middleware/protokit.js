@@ -107,7 +107,7 @@ const publishCorrectAnswers = (examID, questionsWithCorrectAnswers) => {
     });
 }
 
-const checkScore = (examID, userID) => {
+const checkScore = (examID, userID, questionsWithCorrectAnswers) => {
   if(isMochaRunning) return 3;
   const url = `${process.env.PROTOKIT_URL}/check-score`;
 
@@ -115,6 +115,7 @@ const checkScore = (examID, userID) => {
   const postData = {
     examID: examID.toString("hex"),
     userID: userID.toString("hex"),
+    questions: questionsWithCorrectAnswers
   };
 
   // Options for the fetch request
