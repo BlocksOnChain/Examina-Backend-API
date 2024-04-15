@@ -3,7 +3,7 @@ const router = express.Router();
 const User = require("../models/User");
 var Client = require("mina-signer");
 // mainnet or testnet
-const signerClient = new Client({ network: "testnet" });
+const signerClient = new Client({ network: "mainnet" });
 
 router.get("/session/get-message-to-sign/:walletAddress", (req, res) => {
 	const { walletAddress } = req.params;
