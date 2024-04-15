@@ -160,7 +160,7 @@ router.post("/:id/answer/submit", async (req, res) => {
 			user: user._id,
 			exam: examId,
 		});
-
+		console.log("User answers: ", userAnswers);
 		if (!userAnswers) {
 			// If user has not answered before, create a new entry
 			userAnswers = new Answer({
@@ -169,17 +169,21 @@ router.post("/:id/answer/submit", async (req, res) => {
 				answers: [answer],
 			});
 			await userAnswers.save();
-			submitAnswer(examId, user._id, question._id, answer.selectedOption);
+			await submitAnswer(examId, user._id, question._id, answer.selectedOption);
 		} else {
 			// If user has already answered, find the specific answer and update it
-			const existingAnswerIndex = userAnswers.answers.findIndex(
-				(ans) => ans.question.toString() === answer.question.toString()
-			);
-			if (existingAnswerIndex !== -1) {
+			let existingAnswerIndex = 0;
+			userAnswers.answers.forEach(answer => {
+				if(answer.question.toString("hex") == question._id.toString("hex")) {
+					existingAnswerIndex = 1;
+				}
+			});
+			console.log("Existing answer index: ", existingAnswerIndex)
+			if (existingAnswerIndex == 1) {
 				// Update existing answer
 				userAnswers.answers[existingAnswerIndex] = answer;
 				console.log("Gone into Existed answer");
-				submitAnswer(examId, user._id, question._id, answer.selectedOption);
+				await submitAnswer(examId, user._id, question._id, answer.selectedOption);
 				const questions = await Question.find({ exam: exam._id });
 				const questionsWithCorrectAnswers = questions.map((q) => {
 					return {
@@ -187,14 +191,14 @@ router.post("/:id/answer/submit", async (req, res) => {
 						question: q.text,
 						correct_answer: q.correctAnswer,
 					}
-			});
+				});
 				if (userAnswers.answers?.length == questions?.length) {
-					const result = checkScore(exam._id, user._id, questionsWithCorrectAnswers);
+					const result = await checkScore(exam._id, user._id, questionsWithCorrectAnswers);
 					//setTimeout for 1 second to wait for the answer to be submitted to the blockchain
 					setTimeout(() => {
 						console.log("Delayed for 1 second.");
 					}, "1000");
-					const score = getUserScore(exam._id.toString("hex"), user._id.toString("hex")).score;
+					const score = await getUserScore(exam._id.toString("hex"), user._id.toString("hex"));
 					const userScore = new Score({
 						user: user._id,
 						exam: exam._id,
@@ -205,17 +209,27 @@ router.post("/:id/answer/submit", async (req, res) => {
 			} else {
 				// Add new answer if not already exists
 				userAnswers.answers.push(answer);
-				submitAnswer(examId, user._id, question._id, answer.selectedOption);
+				await submitAnswer(examId, user._id, question._id, answer.selectedOption);
 				console.log("User answers: ", userAnswers.answers ? userAnswers.answers.length : "Undefined");
 				const questions = await Question.find({ exam: exam._id });
 				console.log("Questions: ", questions.length ? questions.length : "Undefined");
 				if (userAnswers.answers?.length == questions?.length) {
-					const score = checkScore(exam._id, user._id);
-					console.log("Score: ", score);
+					const questionsWithCorrectAnswers = questions.map((q) => {
+						return {
+							questionID: q._id.toString("hex"),
+							question: q.text,
+							correct_answer: q.correctAnswer,
+						};
+					});
+					const result = await checkScore(exam._id, user._id, questionsWithCorrectAnswers);
+					setTimeout(() => {
+						console.log("Delayed for 1 second.");
+					}, "1000");
+					const score = await getUserScore(exam._id.toString("hex"), user._id.toString("hex"));
 					const userScore = new Score({
 						user: user._id,
 						exam: exam._id,
-						score: score,
+						score: score.score,
 					});
 					await userScore.save();
 				}
