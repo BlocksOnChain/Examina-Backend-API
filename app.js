@@ -42,12 +42,10 @@ app.use(
 		credentials: true,
 	})
 );
-if (app.get("env") === "production") {
 	app.set("trust proxy", 1); // trust first proxy
 	sess.store = new MemoryStore({
 		checkPeriod: 86400000, // prune expired entries every 24h
 	});
-}
 
 sess.store = new MemoryStore({
 	checkPeriod: 86400000, // prune expired entries every 24h
