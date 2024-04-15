@@ -27,24 +27,26 @@ var sess = {
 	resave: false,
 	saveUninitialized: true,
 };
-
+app.use(
+	cors({
+		origin: [
+			"http://localhost:3001",
+			"https://examina.space",
+			"https://examina.space/",
+			"https://www.examina.space/",
+			"https://www.examina.space",
+			"https://www.choz.io",
+			"https://choz.io",
+			"https://choz.io/",
+		],
+		credentials: true,
+	})
+);
 if (app.get("env") === "production") {
 	app.set("trust proxy", 1); // trust first proxy
 	sess.store = new MemoryStore({
 		checkPeriod: 86400000, // prune expired entries every 24h
 	});
-	app.use(
-		cors({
-			origin: [
-				"http://localhost:3000/",
-				"https://examina.space",
-				"https://examina.space/",
-				"https://www.examina.space/",
-				"https://www.examina.space",
-			],
-			credentials: true,
-		})
-	);
 }
 
 sess.store = new MemoryStore({
