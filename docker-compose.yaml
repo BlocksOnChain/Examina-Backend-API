@@ -14,6 +14,7 @@ services:
       MONGO_URI: mongodb://db:27017
       PORT: 3000
       PROTOKIT_URL: http://examina-protokit-api_server-1:5005
+    command: npm run dev
   db:
     container_name: db
     image: mongo:latest
