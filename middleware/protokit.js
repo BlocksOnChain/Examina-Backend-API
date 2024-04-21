@@ -25,7 +25,7 @@ const createExam = (examID, questions) => {
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-      return response.json(); // Parsing JSON response
+      return response; // Parsing JSON response
     })
     .then(data => {
       console.log('Success:', data);

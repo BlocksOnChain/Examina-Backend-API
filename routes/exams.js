@@ -7,6 +7,7 @@ const Score = require("../models/Score");
 const router = express.Router();
 const crypto = require("crypto");
 const Classroom = require("../models/Classroom");
+const {project_questions, } = require("../models/projections");
 const isAuthenticated = require("../middleware/auth");
 const {createExam, getUserScore} = require("../middleware/protokit");
 const {submitAnswer} = require("../middleware/protokit");
@@ -79,7 +80,7 @@ router.post("/create", async (req, res) => {
 });
 router.get("/", async (req, res) => {
 	try {
-		const exams = await Exam.find();
+		const exams = await Exam.find({creator: req.session.user});
 		res.json(exams);
 	} catch (err) {
 		console.error(err);
@@ -293,7 +294,7 @@ router.get("/:id/question/:questionid", async (req, res) => {
 		if (!exam) {
 			return res.status(404).send("exam not found");
 		}
-		const question = await Question.findById(req.params.questionid);
+		const question = await Question.findById(req.params.questionid).projection(project_questions);
 		if (!question) {
 			return res.status(404).send("question not found");
 		}
@@ -313,7 +314,7 @@ router.get("/:id/questions", async (req, res) => {
 		if (!exam) {
 			return res.status(404).send("exam not found");
 		}
-		const questions = await Question.find({ exam: exam._id });
+		const questions = await Question.find({ exam: exam._id }).projection(map_questions);
 		res.json(questions);
 	} catch (err) {
 		console.error(err);
@@ -360,7 +361,7 @@ router.get("/:id/answers/:answerid", async (req, res) => {
 
 router.get("/question/:id", async (req, res) => {
 	try {
-		const question = await Question.findById(req.params.id);
+		const question = await Question.findById(req.params.id).projection(project_questions);
 		const exam = await Exam.findById(question.exam);
 		if(exam.startDate > new Date()) {
 			return res.status(400).json({ message: "Exam has not started yet" });

@@ -38,6 +38,7 @@ app.use(
 			"https://www.choz.io",
 			"https://choz.io",
 			"https://choz.io/",
+			"https://www.choz.io/"
 		],
 		credentials: true,
 	})
