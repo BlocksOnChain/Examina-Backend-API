@@ -8,10 +8,7 @@ const router = express.Router();
 const crypto = require("crypto");
 const Classroom = require("../models/Classroom");
 const isAuthenticated = require("../middleware/auth");
-const createExam = require("../middleware/protokit");
-const submitAnswer = require("../middleware/protokit");
-const publishCorrectAnswers = require("../middleware/protokit");
-const checkScore = require("../middleware/protokit");
+const {createExam, submitAnswer, publishCorrectAnswers, checkScore, getUserScore} = require("../middleware/protokit");
 const isMochaRunning = require("../middleware/isMochaRunning");
 router.use((req, res, next) => {
 	isAuthenticated(req, res, next);

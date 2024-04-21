@@ -5,14 +5,14 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - 3000:3000
+      - 3005:3005
     networks:
       - examina_network
     depends_on:
       - db
     environment:
       MONGO_URI: mongodb://db:27017
-      PORT: 3000
+      PORT: 3005
       PROTOKIT_URL: http://examina-protokit-api_server-1:3000
   db:
     container_name: db
