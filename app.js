@@ -28,10 +28,14 @@ var sess = {
   saveUninitialized: true,
 };
 
+if (app.get("env") === "production") {
+  app.set("trust proxy", 1); // trust first proxy
+}
+
 app.use(
   cors({
     origin: [
-      "http://localhost:3001",
+      "http://localhost:3000/",
       "https://examina.space",
       "https://examina.space/",
       "https://www.examina.space/",
@@ -40,14 +44,6 @@ app.use(
     credentials: true,
   })
 );
-
-if (app.get("env") === "production") {
-  app.set("trust proxy", 1); // trust first proxy
-  sess.store = new MemoryStore({
-    checkPeriod: 86400000, // prune expired entries every 24h
-  });
-}
-
 sess.store = new MemoryStore({
   checkPeriod: 86400000, // prune expired entries every 24h
 });
