@@ -7,11 +7,19 @@ const connectDB = require("./config/db");
 const compression = require("compression");
 const path = require("path");
 const session = require("express-session");
-const MemoryStore = require("memorystore")(session);
-
+var MongoDBStore = require('connect-mongodb-session')(session);
 dotenv.config({ path: "./config/config.env" });
 
 connectDB();
+var store = new MongoDBStore({
+	uri: `${process.env.MONGO_URI}connect_mongodb_session_test`,
+	collection: 'mySessions'
+});
+
+// Catch errors
+store.on('error', function(error) {
+	console.log(error);
+});
 
 const app = express();
 
@@ -23,7 +31,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 var sess = {
 	secret: "examina the best",
-	cookie: { secure: false },
+	cookie: { secure: false, maxAge: 1000 * 60 * 60 * 24 },
 	resave: false,
 	saveUninitialized: true,
 };
@@ -43,14 +51,9 @@ app.use(
 		credentials: true,
 	})
 );
-	app.set("trust proxy", 1); // trust first proxy
-	sess.store = new MemoryStore({
-		checkPeriod: 86400000, // prune expired entries every 24h
-	});
+app.set("trust proxy", 1); // trust first proxy;
 
-sess.store = new MemoryStore({
-	checkPeriod: 86400000, // prune expired entries every 24h
-});
+sess.store = store;
 
 app.use(session(sess));
 if (process.env.NODE_ENV === "development") {
