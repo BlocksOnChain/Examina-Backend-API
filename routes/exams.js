@@ -203,7 +203,7 @@ router.post("/:id/answer/submit", async (req, res) => {
 					const userScore = new Score({
 						user: user._id,
 						exam: exam._id,
-						score: 0,
+						score: score > 0 ? score : 0,
 					});
 					await userScore.save();
 				}
@@ -230,7 +230,7 @@ router.post("/:id/answer/submit", async (req, res) => {
 					const userScore = new Score({
 						user: user._id,
 						exam: exam._id,
-						score: 0,
+						score: score > 0 ? score : 0,
 					});
 					await userScore.save();
 				}
