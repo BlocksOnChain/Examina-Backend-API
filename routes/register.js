@@ -44,12 +44,18 @@ router.post("/", async (req, res) => {
         });
         const saved_user = await newUser.save();
         console.log("Saved user: ", saved_user);
-        req.session.user = saved_user._id;
-        return res.json({ success: true, user: req.session.user });
+        req.session.user = {
+          userId: saved_user._id,
+          walletAddress: saved_user.walletAddress,
+        };
+        return res.json({ success: true, session: req.session.user });
       } else {
-        req.session.user = user[0]._id;
+        req.session.user = {
+          userId: user[0]._id,
+          walletAddress: user[0].walletAddress,
+        };
         console.log("User already exists: ", user[0]);
-        return res.json({ success: true, user: req.session.user });
+        return res.json({ success: true, session: req.session.user });
       }
     } catch (err) {
       console.log(err);
@@ -61,6 +67,7 @@ router.post("/", async (req, res) => {
     });
   }
 });
+
 if (process.env.NODE_ENV === "development") {
   router.post("/dev", async (req, res) => {
     const { walletAddress } = req.body;
@@ -88,7 +95,19 @@ if (process.env.NODE_ENV === "development") {
 }
 
 router.get("/session", (req, res) => {
-  res.json({ user: req.session.token });
+  if (!req.session.user) {
+    return res.status(401).json({ error: "Not authorized!" });
+  }
+  res.json({ success: true, session: req.session.user });
+});
+
+router.get("/logout", (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      return res.status(500).json({ error: "Failed to logout" });
+    }
+    return res.json({ success: true });
+  });
 });
 
 module.exports = router;

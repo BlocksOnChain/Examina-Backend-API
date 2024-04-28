@@ -35,7 +35,8 @@ if (app.get("env") === "production") {
 app.use(
   cors({
     origin: [
-      "http://localhost:3000/",
+      "http://localhost:3001/",
+      "http://localhost:3001",
       "https://examina.space",
       "https://examina.space/",
       "https://www.examina.space/",
