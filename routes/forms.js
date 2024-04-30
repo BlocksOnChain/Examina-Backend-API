@@ -82,3 +82,17 @@ router.post("/:id/submit_answers", async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
+router.get("/:id/answers", async (req, res) => {
+    try {
+        const form = await Form.findById(req.params.id);
+        if (!form) {
+            return res.status(404).json({ error: "Form not found" });
+        }
+        const answers = await FormAnswer.find({form: form._id});
+        res.status(200).json(answers);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: error.message });
+    }
+});
