@@ -1,7 +1,7 @@
 const isMochaRunning = require("../middleware/isMochaRunning");
 const createExam = (examID, questions) => {
   if(isMochaRunning) return;
-  const url =  `${process.env.PROTOKIT_URL}/create/exam`;
+  const url =  `${config.PROTOKIT_URL}/create/exam`;
 
   // Data to be sent in the POST request (can be JSON, FormData, etc.)
   const postData = {
@@ -37,7 +37,7 @@ const createExam = (examID, questions) => {
 
 const submitAnswer = async (examID, userID, questionID, userAnswer) => {
   if(isMochaRunning) return;
-  const url = `${process.env.PROTOKIT_URL}/submit-user-answer`;
+  const url = `${config.PROTOKIT_URL}/submit-user-answer`;
 
   // Data to be sent in the POST request (can be JSON, FormData, etc.)
   const postData = {
@@ -62,7 +62,7 @@ const submitAnswer = async (examID, userID, questionID, userAnswer) => {
 
 const publishCorrectAnswers = (examID, questionsWithCorrectAnswers) => {
   if(isMochaRunning) return;
-  const url = `${process.env.PROTOKIT_URL}/publish-correct-answers`;
+  const url = `${config.PROTOKIT_URL}/publish-correct-answers`;
 
   // Data to be sent in the POST request (can be JSON, FormData, etc.)
   const postData = {
@@ -97,7 +97,7 @@ const publishCorrectAnswers = (examID, questionsWithCorrectAnswers) => {
 
 const checkScore = async (examID, userID, questionsWithCorrectAnswers) => {
   if(isMochaRunning) return 0;
-  const url = `${process.env.PROTOKIT_URL}/check-score`;
+  const url = `${config.PROTOKIT_URL}/check-score`;
 
   // Data to be sent in the POST request (can be JSON, FormData, etc.)
   const postData = {
@@ -129,7 +129,7 @@ const checkScore = async (examID, userID, questionsWithCorrectAnswers) => {
 
 const getUserScore = async (examID, userID) => {
   if(isMochaRunning) return 0;
-  const url = `${process.env.PROTOKIT_URL}/score/${examID}/${userID}`;
+  const url = `${config.PROTOKIT_URL}/score/${examID}/${userID}`;
 
   // Making the POST request using fetch
   const response = await fetch(url)

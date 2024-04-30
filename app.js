@@ -1,20 +1,20 @@
 const express = require("express");
-const dotenv = require("dotenv");
 var cors = require("cors");
 const morgan = require("morgan");
 const exphbs = require("express-handlebars");
 const connectDB = require("./config/db");
+const config = require("./config/config");
+const dotenv = require("dotenv");
 const compression = require("compression");
 const path = require("path");
 const session = require("express-session");
-var nodemailer = require('nodemailer');
+dotenv.config();
 
 var MongoDBStore = require('connect-mongodb-session')(session);
-dotenv.config({ path: "./config/config.env" });
 
 connectDB();
 var store = new MongoDBStore({
-	uri: `${process.env.MONGO_URI}connect_mongodb_session_test`,
+	uri: `${config.MONGO_URI}connect_mongodb_session_test`,
 	collection: 'mySessions'
 });
 
@@ -71,14 +71,5 @@ app.use("/register", require("./routes/register"));
 app.use("/login", require("./routes/login"));
 app.use("/user", require("./routes/user"));
 app.use("/questions", require("./routes/questions"));
-export const transporter = nodemailer.createTransport({
-	port: 465,               // true for 465, false for other ports
-	host: "smtpout.secureserver.net",
-	auth: {
-		user: 'info@choz.io',
-		pass: `${process.env.MAIL_PASSWORD}`,
-	},
-	secure: true,
-});
 
 module.exports = app;
