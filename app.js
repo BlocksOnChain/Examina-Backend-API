@@ -69,5 +69,5 @@ app.use("/register", require("./routes/register"));
 app.use("/login", require("./routes/login"));
 app.use("/user", require("./routes/user"));
 app.use("/questions", require("./routes/questions"));
-
+app.use("/forms", require("./routes/forms"));
 module.exports = app;
