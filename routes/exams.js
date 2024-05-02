@@ -99,7 +99,7 @@ router.get("/:id", async (req, res) => {
 		if (!exam) {
 			return res.status(404).json({ message: "Exam not found" });
 		}
-		res.json(exam);
+		res.status(200).json(exam);
 	} catch (err) {
 		console.error(err);
 		res.status(500).json({ message: "Internal Server Error" });
@@ -276,50 +276,6 @@ router.post("/:id/answer/submit", async (req, res) => {
 		res.status(500).json({ message: error.message });
 	}
 });
-
-/* 
-router.get("/tryEnd", async (req, res) => {
-	try {
-		const exams = await Exam.find({ isCompleted: false });
-		if (!exams) {
-			return res.status(404).json({ message: "Exams not found that are not completed" });
-		}
-		exams.forEach(async (exam) => {
-			const startTime = exam.startDate;
-			const endTime = new Date(startTime.getTime() + exam.duration * 60000); // Convert duration from minutes to milliseconds
-			if (new Date() >= endTime) {
-				exam.isCompleted = true;
-				await exam.save();
-				const questions = await Question.find({ exam: exam._id });
-				publishCorrectAnswers(
-					req.params.id,
-					questions.map((q) => {
-						return {
-							question_id: q._id,
-							question: q.text,
-							correctAnswer: q.correctAnswer,
-						};
-					})
-				);
-				const usersJoinedExam = await Answer.find({ exam: req.params.id }).populate("user");
-				usersJoinedExam.foreach(async (user) => {
-					const score = checkScore(exam._id, user._id);
-					console.log("Score: ", score);
-					const userScore = new Score({
-						user: user._id,
-						exam: exam._id,
-						score: score,
-					});
-					await userScore.save();
-				});
-			}
-		});
-		res.status(200).json({ message: "Exam ended successfully" });
-	} catch (error) {
-		console.log(error);
-		res.status(500).json({ message: error.message });
-	}
-}); */
 
 router.get("/:id/question/:questionid", async (req, res) => {
 	try {
