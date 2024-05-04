@@ -24,7 +24,7 @@ router.get("/create", (req, res) => {
 
 router.post("/create", async (req, res) => {
   try {
-    const user = await User.findById(req.session.user);
+    const user = await User.findById(req.session.user.userId);
     // console.log("User: ", user._id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -118,7 +118,7 @@ router.get("/:id", async (req, res) => {
 
 router.post("/:id/answer/submit", async (req, res) => {
   try {
-    const user = await User.findById(req.session.user);
+    const user = await User.findById(req.session.user.userId);
     const hashInput =
       user.walletAddress + JSON.stringify(req.body.answer.selectedOption);
     const answerHash = crypto
@@ -165,7 +165,7 @@ router.post("/:id/answer/submit", async (req, res) => {
     if (!userAnswers) {
       // If user has not answered before, create a new entry
       userAnswers = new Answer({
-        user: req.session.user,
+        user: req.session.user.userId,
         exam: examId,
         answers: [answer],
       });
@@ -366,7 +366,7 @@ router.get("/:id/answers", async (req, res) => {
       return res.status(404).send("exam not found");
     }
     const answers = await Answer.find({
-      user: req.session.user,
+      user: req.session.user.userId,
       exam: exam._id,
     }).populate("answers");
     res.json(answers);
@@ -414,7 +414,7 @@ router.get("/question/:id", async (req, res) => {
 
 router.get("/scores/:examID", async (req, res) => {
   try {
-    const user = await User.findById(req.session.user);
+    const user = await User.findById(req.session.user.userId);
     if (!user) {
       return res.status(401).json("Unauthorized");
     }
@@ -444,7 +444,7 @@ router.get("/scores/:examID", async (req, res) => {
 
 router.get("/scores/get_user_score/:examID", async (req, res) => {
   try {
-    const user = await User.findById(req.session.user);
+    const user = await User.findById(req.session.user.userId);
     if (!user) {
       return res.status(401).json("Unauthorized");
     }
