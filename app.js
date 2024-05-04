@@ -12,7 +12,7 @@ dotenv.config({ path: "./config/config.env" });
 
 connectDB();
 var store = new MongoDBStore({
-	uri: `${process.env.MONGO_URI}connect_mongodb_session_test`,
+	uri: `${process.env.MONGO_URI}/connect_mongodb_session_test`,
 	collection: 'mySessions'
 });
 
