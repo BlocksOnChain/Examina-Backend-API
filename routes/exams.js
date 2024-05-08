@@ -7,7 +7,7 @@ const Score = require("../models/Score");
 const router = express.Router();
 const crypto = require("crypto");
 const Classroom = require("../models/Classroom");
-const { project_questions } = require("../models/projections");
+const { project_questions, map_questions } = require("../models/projections");
 const isAuthenticated = require("../middleware/auth");
 const { createExam, getUserScore } = require("../middleware/protokit");
 const { submitAnswer } = require("../middleware/protokit");
@@ -346,9 +346,8 @@ router.get("/:id/questions", async (req, res) => {
     if (!exam) {
       return res.status(404).send("exam not found");
     }
-    const questions = await Question.find({ exam: exam._id }).projection(
-      map_questions
-    );
+    const questions = await Question.find({ exam: exam._id }, map_questions);
+
     res.json(questions);
   } catch (err) {
     console.error(err);
