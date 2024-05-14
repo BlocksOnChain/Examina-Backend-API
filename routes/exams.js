@@ -18,9 +18,7 @@ const { setTimeout } = require("timers");
 router.use((req, res, next) => {
   isAuthenticated(req, res, next);
 });
-router.get("/create", (req, res) => {
-  res.render("exams/create");
-});
+
 
 router.post("/create", async (req, res) => {
   try {

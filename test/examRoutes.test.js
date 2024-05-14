@@ -13,7 +13,7 @@ const signerClient = new Client({ network: "mainnet" });
 describe("Exam Endpoint Tests", () => {
 	let testSession;
 	beforeAll(async () => {
-		testSession = session(app); // Test oturumu oluşturduk
+		testSession = session(app);
 		const keys_demo = {
 			publicKey:
 				"B62qmCGGG98iPmNEeFLByG3tPdnR6UvVvrXbkDPAC7DYJUvJVHFm1B3",
@@ -35,7 +35,7 @@ describe("Exam Endpoint Tests", () => {
 
 		testSession.session = testSession.session || {};
 		testSession.session.token = resGet.body.message;
-		testSession.session.message = { message: resGet.body.message };
+		testSession.session.message = resGet.body;
 		const signParams = {
 			message: message,
 		};
@@ -131,7 +131,7 @@ describe("Exam Endpoint Tests", () => {
 	});
 
 	test("GET /exams/:id/questions should respond with 404 status code due to wrong exam id", async () => {
-		fakeTestExamId = "6605768c642d1dea4766e07b";
+		fakeTestExamId = "7605768c642d1dea4766e07b";
 		const res = await testSession.get(`/exams/${fakeTestExamId}/questions`);
 		expect(res.statusCode).toEqual(404);
 	});
