@@ -31,7 +31,8 @@ or
 
 `docker-compose up -d` ( Windows )
 
-## You can use `localhost:3000`
+## The app will be running on `localhost:3000`
+
 
 
 ## You can check the diagram for the API flow from here :
