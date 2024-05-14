@@ -31,6 +31,9 @@ or
 
 `docker-compose up -d` ( Windows )
 
+
+
+
 **The app will be running on `localhost:3000`**
 
 
