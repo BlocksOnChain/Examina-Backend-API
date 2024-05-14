@@ -116,6 +116,9 @@ router.get("/:id", async (req, res) => {
 router.post("/:id/answer/submit", async (req, res) => {
 	try {
 		const user = await User.findById(req.session.user.userId);
+		if (!user) {
+			return res.status(401).json({ message: "Unauthorized" });
+		}
 		const hashInput =
 			user.walletAddress + JSON.stringify(req.body.answer.selectedOption);
 		const answerHash = crypto
@@ -123,6 +126,9 @@ router.post("/:id/answer/submit", async (req, res) => {
 			.update(hashInput)
 			.digest("hex");
 		const question = await Question.findById(req.body.answer.questionId);
+		if (!question) {
+			return res.status(404).json({ message: "Question not found" });
+		}
 		const answer = {
 			question: question._id,
 			selectedOption: req.body.answer.selectedOption,
@@ -196,6 +202,11 @@ router.post("/:id/answer/submit", async (req, res) => {
 					answer.selectedOption
 				);
 				const questions = await Question.find({ exam: exam._id });
+				if (!questions) {
+					return res
+						.status(404)
+						.json({ message: "Questions not found" });
+				}
 				const questionsWithCorrectAnswers = questions.map((q) => {
 					return {
 						questionID: q._id.toString("hex"),
@@ -331,8 +342,7 @@ router.get("/:id/question/:questionid", async (req, res) => {
 		if (!exam) {
 			return res.status(404).json({ message: "exam not found" });
 		}
-		const question = Question.findById(
-			req.params.questionid,
+		const question = await Question.findById(req.params.questionid).select(
 			project_questions
 		);
 		if (!question) {
@@ -412,26 +422,32 @@ router.get("/:id/answers/:answerid", async (req, res) => {
 	}
 });
 
-router.get("/question/:id", async (req, res) => {
-	try {
-		const question = await Question.findById(req.params.id).projection(
-			project_questions
-		);
-		const exam = await Exam.findById(question.exam);
-		if (exam.startDate > new Date()) {
-			return res
-				.status(400)
-				.json({ message: "Exam has not started yet" });
-		}
-		if (!question) {
-			return res.status(404).send("question not found");
-		}
-		res.json(question);
-	} catch (err) {
-		console.error(err);
-		res.status(500).json("error finding question");
-	}
-});
+// router.get("/question/:id", async (req, res) => {
+// 	try {
+// 		const question = await Question.findById(req.params.id).select(
+// 			project_questions
+// 		);
+// 		console.log("Question: ", question);
+// 		if (!question) {
+// 			return res.status(404).json({ message: "question not found" });
+// 		}
+// 		const exam = await Exam.findById(question.exam);
+// 		console.log("Exam: ", exam);
+// 		if (!exam) {
+// 			return res.status(404).json({ message: "exam not found" });
+// 		}
+// 		if (exam.startDate > new Date()) {
+// 			return res
+// 				.status(400)
+// 				.json({ message: "Exam has not started yet" });
+// 		}
+
+// 		res.json(question);
+// 	} catch (err) {
+// 		console.error(err);
+// 		res.status(500).json("error finding question");
+// 	}
+// });
 
 router.get("/scores/:examID", async (req, res) => {
 	try {
