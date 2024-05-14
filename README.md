@@ -1,15 +1,15 @@
-## To start :
-# 1. Create docker network
+# To start :
+## 1. Create docker network
 sudo docker create network examina_network
-# 2. Run docker compose
+## 2. Run docker compose
 sudo docker compose up -d ( MacOS, Linux )
 or
 docker-compose up -d ( Windows )
-# 3. Run protokit
+## 3. Run protokit
 go to Examina-Protokit repo from your terminal and run:
-sudo docker compose up -d ( MacOS, Linux )
+`sudo docker compose up -d` ( MacOS, Linux )
 or
-docker-compose up -d ( Windows )
+`docker-compose up -d` ( Windows )
 
 
 ## You can check the diagram for the API flow from here :
