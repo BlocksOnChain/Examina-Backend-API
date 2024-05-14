@@ -8,7 +8,7 @@ const mongoose = require("mongoose");
 var Client = require("mina-signer");
 const { questions } = require("./testQuestions");
 
-const signerClient = new Client({ network: "testnet" });
+const signerClient = new Client({ network: "mainnet" });
 
 describe("Exam Endpoint Tests", () => {
 	let testSession;

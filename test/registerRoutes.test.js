@@ -5,7 +5,7 @@ var Client = require("mina-signer");
 const session = require("supertest-session");
 const User = require("../models/User");
 // mainnet or testnet
-const signerClient = new Client({ network: "testnet" });
+const signerClient = new Client({ network: "mainnet" });
 
 describe("Register Endpoint Tests", () => {
 	let testSession = null;
