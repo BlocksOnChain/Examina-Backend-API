@@ -31,6 +31,8 @@ or
 
 `docker-compose up -d` ( Windows )
 
+## You can use `localhost:3000`
+
 
 ## You can check the diagram for the API flow from here :
 https://drive.google.com/file/d/1PI3lqNI9EkaBnj8c4wtQMHXOVWOwuigK/view?usp=sharing
