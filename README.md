@@ -6,9 +6,17 @@ sudo docker compose up -d ( MacOS, Linux )
 or
 docker-compose up -d ( Windows )
 ## 3. Run protokit
+
+
 go to Examina-Protokit repo from your terminal and run:
+
+
 `sudo docker compose up -d` ( MacOS, Linux )
+
+
 or
+
+
 `docker-compose up -d` ( Windows )
 
 
