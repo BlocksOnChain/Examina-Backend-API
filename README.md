@@ -1,10 +1,22 @@
 # To start :
 ## 1. Create docker network
-sudo docker create network examina_network
+
+
+`sudo docker create network examina_network`
+
+
 ## 2. Run docker compose
-sudo docker compose up -d ( MacOS, Linux )
+
+
+`sudo docker compose up -d` ( MacOS, Linux )
+
+
 or
-docker-compose up -d ( Windows )
+
+
+`docker-compose up -d` ( Windows )
+
+
 ## 3. Run protokit
 
 
