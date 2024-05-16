@@ -60,7 +60,7 @@ describe("Exam Endpoint Tests", () => {
 		await Question.deleteMany({});
 		await Answer.deleteMany({});
 		await mongoose.disconnect();
-		testSession = null;
+		testSession.destroy();
 	});
 
 	let testExamId;
