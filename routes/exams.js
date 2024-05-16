@@ -13,7 +13,7 @@ const { createExam, getUserScore } = require("../middleware/protokit");
 const { submitAnswer } = require("../middleware/protokit");
 const { publishCorrectAnswers } = require("../middleware/protokit");
 const { checkScore } = require("../middleware/protokit");
-const isMochaRunning = require("../middleware/isMochaRunning");
+const isMochaRunning = require("../middleware/isTestEnv");
 const { setTimeout } = require("timers");
 router.use((req, res, next) => {
 	isAuthenticated(req, res, next);
