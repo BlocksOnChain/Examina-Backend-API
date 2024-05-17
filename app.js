@@ -2,24 +2,29 @@ const express = require("express");
 const dotenv = require("dotenv");
 var cors = require("cors");
 const morgan = require("morgan");
-const exphbs = require("express-handlebars");
 const connectDB = require("./config/db");
 const compression = require("compression");
 const path = require("path");
 const session = require("express-session");
-var MongoDBStore = require('connect-mongodb-session')(session);
+// var MongoDBStore = require("connect-mongodb-session")(session);
+const MemoryStore = require("memorystore")(session);
 dotenv.config({ path: "./config/config.env" });
 
-connectDB();
-var store = new MongoDBStore({
-	uri: `${process.env.MONGO_URI}/connect_mongodb_session_test`,
-	collection: 'mySessions'
-});
+// const isTestEnv = require("./middleware/isTestEnv");
 
-// Catch errors
-store.on('error', function(error) {
-	console.log(error);
-});
+connectDB();
+
+// if (!isTestEnv) {
+// 	var store = new MongoDBStore({
+// 		uri: `${process.env.MONGO_URI}/connect_mongodb_session_test`,
+// 		collection: "mySessions",
+// 	});
+
+// 	// Catch errors
+// 	store.on("error", function (error) {
+// 		console.log(error);
+// 	});
+// }
 
 const app = express();
 
@@ -35,6 +40,11 @@ var sess = {
 	resave: false,
 	saveUninitialized: true,
 };
+
+sess.store = new MemoryStore({
+	checkPeriod: 86400000, // prune expired entries every 24h
+});
+
 app.use(
 	cors({
 		origin: [
@@ -46,27 +56,24 @@ app.use(
 			"https://www.choz.io",
 			"https://choz.io",
 			"https://choz.io/",
-			"https://www.choz.io/"
+			"https://www.choz.io/",
 		],
 		credentials: true,
 	})
 );
 app.set("trust proxy", 1); // trust first proxy;
 
-sess.store = store;
+// if (!isTestEnv) {
+// 	sess.store = store;
+// }
 
 app.use(session(sess));
 if (process.env.NODE_ENV === "development") {
 	app.use(morgan("dev"));
 }
 
-app.engine(".hbs", exphbs.engine({ defaultLayout: "main", extname: ".hbs" }));
-app.set("view engine", ".hbs");
-
-app.use("/", require("./routes/index"));
 app.use("/exams", require("./routes/exams"));
 app.use("/register", require("./routes/register"));
-app.use("/login", require("./routes/login"));
 app.use("/user", require("./routes/user"));
 app.use("/questions", require("./routes/questions"));
 
