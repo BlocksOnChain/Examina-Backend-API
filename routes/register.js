@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
 var Client = require("mina-signer");
+const isTestEnv = require("../middleware/isTestEnv");
 // mainnet or testnet
 const signerClient = new Client({ network: "mainnet" });
 
@@ -11,7 +12,7 @@ router.get("/session/get-message-to-sign/:walletAddress", (req, res) => {
 	// save token to user's session
 	req.session.token = token;
 	const message = `${req.session.token}${walletAddress}`;
-	req.session.message = { message: message };
+	req.session.message = isTestEnv ? { message: message } : message;
 	// console.log("GET req.session.message: ", req.session.message);
 	res.status(200).json({ message: message });
 });
