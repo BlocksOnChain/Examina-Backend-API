@@ -59,7 +59,8 @@ describe("Exam Endpoint Tests", () => {
 		await Exam.deleteMany({});
 		await Question.deleteMany({});
 		await Answer.deleteMany({});
-		await mongoose.disconnect();
+		// await mongoose.disconnect();
+		await mongoose.connection.close();
 		testSession.destroy();
 	});
 
@@ -86,6 +87,7 @@ describe("Exam Endpoint Tests", () => {
 		testExamId = res.body.newExam._id;
 	});
 
+	// We want to an internal server error by a type error about questions array
 	test("POST /exams/create should respond with status code 500 due to saving error", async () => {
 		const res = await testSession.post("/exams/create").send({
 			title: "Test Exam",

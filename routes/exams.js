@@ -36,6 +36,8 @@ router.post("/create", async (req, res) => {
 			secretKey: req.body.secretKey,
 		});
 
+		console.log("Questions: ", req.body.questions);
+
 		newExam
 			.save()
 			.then((result) => {

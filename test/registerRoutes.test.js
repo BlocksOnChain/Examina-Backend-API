@@ -14,7 +14,8 @@ describe("Register Endpoint Tests", () => {
 	});
 	afterAll(async () => {
 		await User.deleteMany({});
-		await mongoose.disconnect();
+		// await mongoose.disconnect();
+		await mongoose.connection.close();
 		testSession = null;
 	});
 	test("GET /register/session/get-message-to-sign/:walletAddress should return a message to sign for a given wallet address", async () => {
