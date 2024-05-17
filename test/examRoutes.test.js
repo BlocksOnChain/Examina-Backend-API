@@ -180,10 +180,10 @@ describe("Exam Endpoint Tests", () => {
 		);
 
 		testQuestionId = questionsRes.body[0]._id;
-		fakeQuestionExamId = "6605768c642d1dea4766e07b";
+		fakeTestQuestionId = "6605768c642d1dea4766e07b";
 
 		const res = await testSession.get(
-			`/exams/${testExamId}/question/${fakeQuestionExamId}`
+			`/exams/${testExamId}/question/${fakeTestQuestionId}`
 		);
 		expect(res.statusCode).toEqual(404);
 	});
@@ -209,7 +209,7 @@ describe("Exam Endpoint Tests", () => {
 		expect(res.body.message).toEqual("Answer submitted successfully");
 	});
 
-	test("POST /exams/:id/answer/submit should respond with 500 status code due to wrong exam id", async () => {
+	test("POST /exams/:id/answer/submit should respond with 404 status code due to wrong exam id", async () => {
 		const questionsRes = await testSession.get(
 			`/exams/${testExamId}/questions`
 		);
@@ -226,33 +226,9 @@ describe("Exam Endpoint Tests", () => {
 				},
 			});
 
-		expect(res.statusCode).toEqual(500);
+		expect(res.statusCode).toEqual(404);
 		expect(res.body.message).toEqual("Exam not found");
 	});
-
-	// test("POST /exams/:id/answer/submit should submit an answer and respond with an error after exam duration has passed", async () => {
-	// 	const questionsRes = await testSession.get(
-	// 		`/exams/${testExamId}/questions`
-	// 	);
-
-	// 	testQuestionId = questionsRes.body[1]._id;
-
-	// 	// jest.advanceTimersByTime(1440 * 60 * 1000 + 1000);
-
-	// 	const res = await testSession
-	// 		.post(`/exams/${testExamId}/answer/submit`)
-	// 		.send({
-	// 			answer: {
-	// 				questionId: testQuestionId,
-	// 				selectedOption: 0,
-	// 			},
-	// 		});
-
-	// 	expect(res.statusCode).toEqual(400);
-	// 	expect(res.body.message).toEqual(
-	// 		"Exam has already ended. You cannot submit answers."
-	// 	);
-	// });
 
 	test("POST /exams/:id/answer/submit should submit an answer and update the answer with status 200", async () => {
 		const answersRes = await testSession.get(

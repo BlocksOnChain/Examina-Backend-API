@@ -13,7 +13,7 @@ router.get("/session/get-message-to-sign/:walletAddress", (req, res) => {
 	const message = `${req.session.token}${walletAddress}`;
 	req.session.message = { message: message };
 	// console.log("GET req.session.message: ", req.session.message);
-	res.json({ message: message });
+	res.status(200).json({ message: message });
 });
 
 router.post("/", async (req, res) => {
@@ -48,17 +48,22 @@ router.post("/", async (req, res) => {
 					userId: saved_user._id,
 					walletAddress: saved_user.walletAddress,
 				};
-				return res.json({ success: true, session: req.session.user });
+				return res
+					.status(200)
+					.json({ success: true, session: req.session.user });
 			} else {
 				req.session.user = {
 					userId: user[0]._id,
 					walletAddress: user[0].walletAddress,
 				};
 				console.log("User already exists: ", user[0]);
-				return res.json({ success: true, session: req.session.user });
+				return res
+					.status(200)
+					.json({ success: true, session: req.session.user });
 			}
 		} catch (err) {
 			console.log(err);
+			res.status(500).json({ message: "Internal server error" });
 		}
 	} else {
 		res.status(401).json({
@@ -82,23 +87,28 @@ if (process.env.NODE_ENV === "development") {
 				const saved_user = await newUser.save();
 				console.log("Saved user: ", saved_user);
 				req.session.user = saved_user._id;
-				return res.json({ success: true, user: req.session.user });
+				return res
+					.status(200)
+					.json({ success: true, user: req.session.user });
 			} else {
 				req.session.user = user[0]._id;
 				console.log("User already exists: ", user[0]);
-				return res.json({ success: true, user: req.session.user });
+				return res
+					.status(200)
+					.json({ success: true, user: req.session.user });
 			}
 		} catch (err) {
 			console.log(err);
+			res.status(500).json({ message: "Internal server error" });
 		}
 	});
 }
 
 router.get("/session", (req, res) => {
 	if (!req.session.user) {
-		return res.status(401).json({ error: "Not authorized!" });
+		return res.status(401).json({ message: "Unauthorized!" });
 	}
-	return res.json({ success: true, session: req.session.user });
+	return res.status(200).json({ success: true, session: req.session.user });
 });
 
 router.get("/logout", (req, res) => {
@@ -106,7 +116,7 @@ router.get("/logout", (req, res) => {
 		if (err) {
 			return res.status(500).json({ error: "Failed to logout!" });
 		}
-		return res.json({ success: true, message: "Logged out!" });
+		return res.status(200).json({ success: true, message: "Logged out!" });
 	});
 });
 

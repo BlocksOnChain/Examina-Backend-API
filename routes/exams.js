@@ -6,14 +6,16 @@ const User = require("../models/User");
 const Score = require("../models/Score");
 const router = express.Router();
 const crypto = require("crypto");
-const Classroom = require("../models/Classroom");
 const { project_questions, map_questions } = require("../models/projections");
 const isAuthenticated = require("../middleware/auth");
-const { createExam, getUserScore } = require("../middleware/protokit");
-const { submitAnswer } = require("../middleware/protokit");
-const { publishCorrectAnswers } = require("../middleware/protokit");
-const { checkScore } = require("../middleware/protokit");
-const isMochaRunning = require("../middleware/isTestEnv");
+const {
+	createExam,
+	getUserScore,
+	publishCorrectAnswers,
+	submitAnswer,
+	checkScore,
+} = require("../middleware/protokit");
+const isTestEnv = require("../middleware/isTestEnv");
 const { setTimeout } = require("timers");
 router.use((req, res, next) => {
 	isAuthenticated(req, res, next);
@@ -24,7 +26,7 @@ router.post("/create", async (req, res) => {
 		const user = await User.findById(req.session.user.userId);
 		// console.log("User: ", user._id);
 		if (!user) {
-			return res.status(404).json({ message: "User not found" });
+			return res.status(401).json({ message: "Unauthorized" });
 		}
 		const newExam = new Exam({
 			creator: user._id,
@@ -71,16 +73,17 @@ router.post("/create", async (req, res) => {
 			})
 			.catch((err) => {
 				console.log(err);
-				res.status(500).send({ type: "Error when saving" });
+				res.status(500).json({ message: "Error when saving" });
 			});
 	} catch (err) {
-		res.status(500).json({ message: err });
+		res.status(500).json({ message: "Internal server error" });
 	}
 });
+
 router.get("/", async (req, res) => {
 	try {
 		const exams = await Exam.find({ creator: req.session.user.userId });
-		res.json(exams);
+		res.status(200).json(exams);
 	} catch (err) {
 		console.error(err);
 		res.status(500).json({ message: "Internal Server Error" });
@@ -89,12 +92,12 @@ router.get("/", async (req, res) => {
 
 router.post("/create/mock_exam", async (req, res) => {
 	try {
-		if (!isMochaRunning) {
+		if (!isTestEnv) {
 			const result = await fetch(
 				`${process.env.PROTOKIT_URL}/create/mock_exam`
 			);
 			console.log("Result: ", result);
-			res.json(result);
+			res.status(200).json(result);
 		}
 	} catch (error) {
 		console.error(error);
@@ -106,12 +109,12 @@ router.get("/:id", async (req, res) => {
 	try {
 		const exam = await Exam.findById(req.params.id);
 		if (!exam) {
-			return res.status(404).render("error/404");
+			return res.status(404).json({ message: "Exam not found" });
 		}
-		res.json(exam);
+		res.status(200).json(exam);
 	} catch (err) {
 		console.error(err);
-		res.render("error/500");
+		res.status(500).json({ message: "Internal Server Error" });
 	}
 });
 
@@ -140,7 +143,7 @@ router.post("/:id/answer/submit", async (req, res) => {
 		const exam = await Exam.findById(examId);
 
 		if (!exam) {
-			return res.status(500).json({ message: "Exam not found" });
+			return res.status(404).json({ message: "Exam not found" });
 		}
 
 		// Calculate end time of the exam
@@ -290,7 +293,7 @@ router.post("/:id/answer/submit", async (req, res) => {
 		res.status(200).json({ message: "Answer submitted successfully" });
 	} catch (error) {
 		console.log(error);
-		res.status(500).json({ message: error.message });
+		res.status(500).json({ message: "Internal server error" });
 	}
 });
 
@@ -338,22 +341,22 @@ router.get("/tryEnd", async (req, res) => {
 	}
 }); */
 
-router.get("/:id/question/:questionid", async (req, res) => {
+router.get("/:id/question/:questionId", async (req, res) => {
 	try {
 		const exam = await Exam.findById(req.params.id);
 		if (!exam) {
-			return res.status(404).json({ message: "exam not found" });
+			return res.status(404).json({ message: "Exam not found" });
 		}
-		const question = await Question.findById(req.params.questionid).select(
+		const question = await Question.findById(req.params.questionId).select(
 			project_questions
 		);
 		if (!question) {
-			return res.status(404).send("question not found");
+			return res.status(404).json({ message: "Question not found" });
 		}
-		res.json(question);
+		res.status(200).json(question);
 	} catch (err) {
 		console.error(err);
-		res.render("error/500");
+		res.status(500).json({ message: "Internal server error" });
 	}
 });
 
@@ -361,7 +364,7 @@ router.get("/:id/questions", async (req, res) => {
 	try {
 		const exam = await Exam.findById(req.params.id);
 		if (!exam) {
-			return res.status(404).json({ message: "exam not found" });
+			return res.status(404).json({ message: "Exam not found" });
 		}
 		if (exam.startDate > new Date()) {
 			return res
@@ -374,10 +377,10 @@ router.get("/:id/questions", async (req, res) => {
 			map_questions
 		);
 
-		res.json(questions);
+		res.status(200).json(questions);
 	} catch (err) {
 		console.error(err);
-		res.render("error/500");
+		res.status(500).json({ message: "Internal server error" });
 	}
 });
 
@@ -385,7 +388,7 @@ router.get("/:id/answers", async (req, res) => {
 	try {
 		const exam = await Exam.findById(req.params.id);
 		if (!exam) {
-			return res.status(404).json({ message: "exam not found" });
+			return res.status(404).json({ message: "Exam not found" });
 		}
 		if (exam.startDate > new Date()) {
 			return res
@@ -397,18 +400,18 @@ router.get("/:id/answers", async (req, res) => {
 			user: req.session.user.userId,
 			exam: exam._id,
 		}).populate("answers");
-		res.json(answers);
+		res.status(200).json(answers);
 	} catch (err) {
 		console.error(err);
-		res.render("error/500");
+		res.status(500).json({ message: "Internal server error" });
 	}
 });
 
-router.get("/:id/answers/:answerid", async (req, res) => {
+router.get("/:id/answers/:answerId", async (req, res) => {
 	try {
 		const exam = await Exam.findById(req.params.id);
 		if (!exam) {
-			return res.status(404).json({ message: "exam not found" });
+			return res.status(404).json({ message: "Exam not found" });
 		}
 		if (exam.startDate > new Date()) {
 			return res
@@ -416,11 +419,11 @@ router.get("/:id/answers/:answerid", async (req, res) => {
 				.json({ message: "Exam has not started yet" });
 		}
 
-		const answer = await Answer.findById(req.params.answerid);
-		res.json(answer);
+		const answer = await Answer.findById(req.params.answerId);
+		res.status(200).json(answer);
 	} catch (err) {
 		console.error(err);
-		res.render("error/500");
+		res.status(500).json({ message: "Internal server error" });
 	}
 });
 
@@ -451,62 +454,64 @@ router.get("/:id/answers/:answerid", async (req, res) => {
 // 	}
 // });
 
-router.get("/scores/:examID", async (req, res) => {
+router.get("/scores/:examId", async (req, res) => {
 	try {
 		const user = await User.findById(req.session.user.userId);
 		if (!user) {
-			return res.status(401).json("Unauthorized");
+			return res.status(401).json({ message: "Unauthorized" });
 		}
 		const userId = user._id;
-		const examID = req.params.examID;
+		const examId = req.params.examId;
 
-		const exam = await Exam.findById(examID);
+		const exam = await Exam.findById(examId);
 		if (exam.startDate > new Date()) {
 			return res
 				.status(400)
 				.json({ message: "Exam has not started yet" });
 		}
 		if (!exam) {
-			return res.status(404).json("Exam not found");
+			return res.status(404).json({ message: "Exam not found" });
 		}
 
 		const creatorId = exam.creator.toString();
 		if (userId === creatorId) {
-			const scores = await Score.find({ exam: examID });
-			return res.json(scores);
+			const scores = await Score.find({ exam: examId });
+			return res.status(200).json(scores);
 		} else {
-			return res.status(403).json("Unauthorized access");
+			return res.status(403).json({ message: "Unauthorized access" });
 		}
 	} catch (err) {
 		console.error(err);
-		res.status(500).json("Error finding scores");
+		res.status(500).json({ message: "Error finding scores" });
 	}
 });
 
-router.get("/scores/get_user_score/:examID", async (req, res) => {
+router.get("/scores/get_user_score/:examId", async (req, res) => {
 	try {
 		const user = await User.findById(req.session.user.userId);
 		if (!user) {
-			return res.status(401).json("Unauthorized");
+			return res.status(401).json({ message: "Unauthorized" });
 		}
 
 		const userId = user._id;
-		const examID = req.params.examID;
+		const examId = req.params.examId;
 
-		const exam = await Exam.findById(examID);
+		const exam = await Exam.findById(examId);
 		if (!exam) {
-			return res.status(404).json("Exam not found");
+			return res.status(404).json({ message: "Exam not found" });
 		}
 
-		const score = await Score.findOne({ exam: examID, user: userId });
+		const score = await Score.findOne({ exam: examId, user: userId });
 		if (!score) {
-			return res.status(404).json("Score not found for this user");
+			return res
+				.status(404)
+				.json({ message: "Score not found for this user" });
 		}
 
-		res.json(score);
+		res.status(200).json(score);
 	} catch (err) {
 		console.error(err);
-		res.status(500).json("Error finding user score");
+		res.status(500).json({ message: "Error finding user score" });
 	}
 });
 

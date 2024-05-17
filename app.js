@@ -2,7 +2,6 @@ const express = require("express");
 const dotenv = require("dotenv");
 var cors = require("cors");
 const morgan = require("morgan");
-const exphbs = require("express-handlebars");
 const connectDB = require("./config/db");
 const compression = require("compression");
 const path = require("path");
@@ -73,13 +72,8 @@ if (process.env.NODE_ENV === "development") {
 	app.use(morgan("dev"));
 }
 
-app.engine(".hbs", exphbs.engine({ defaultLayout: "main", extname: ".hbs" }));
-app.set("view engine", ".hbs");
-
-app.use("/", require("./routes/index"));
 app.use("/exams", require("./routes/exams"));
 app.use("/register", require("./routes/register"));
-app.use("/login", require("./routes/login"));
 app.use("/user", require("./routes/user"));
 app.use("/questions", require("./routes/questions"));
 
