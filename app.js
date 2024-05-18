@@ -38,11 +38,8 @@ var sess = {
 app.use(
 	cors({
 		origin: [
+			"http://localhost:3000",
 			"http://localhost:3001",
-			"https://examina.space",
-			"https://examina.space/",
-			"https://www.examina.space/",
-			"https://www.examina.space",
 			"https://www.choz.io",
 			"https://choz.io",
 			"https://choz.io/",
