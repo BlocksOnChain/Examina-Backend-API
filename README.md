@@ -1,40 +1,79 @@
-# To start :
-## 1. Create docker network
+```markdown
+# Choz API Setup Guide
+
+Welcome to the Choz API project! This guide will assist you in setting up the application on your local machine using Docker. Follow the steps below to create the necessary Docker network, run the application with Docker Compose, and start the Protokit service.
+
+## Prerequisites
+
+Ensure you have the following installed on your system:
+- Docker
+- Docker Compose
+
+## Steps to Start
+
+### 1. Create Docker Network
+
+First, create a Docker network for the Choz API project. Open your terminal and execute the following command:
+
+```sh
+sudo docker create network examina_network
+```
+
+### 2. Install Libraries
+
+```sh
+npm i
+```
+
+### 3. Run Docker Compose
+
+Next, run Docker Compose to set up the application containers. Depending on your operating system, use the appropriate command:
+
+**For macOS and Linux:**
+
+```sh
+sudo docker compose up -d
+```
+
+**For Windows:**
+
+```sh
+docker-compose up -d
+```
+
+### 3. Run Protokit
+
+To run the Protokit service, navigate to the `Examina-Protokit` repository in your terminal and execute the following command:
+
+```sh
+npm i
+```
+
+**For  Linux:**
+
+```sh
+sudo docker compose up -d
+```
+
+**For Windows and MacOS:**
+
+```sh
+docker-compose up -d
+```
+
+## Access the Application
+
+Once the setup is complete, the API will be running and accessible at:
+
+```
+http://localhost:3005
+```
 
 
-`sudo docker create network examina_network`
+## Conclusion
 
-
-## 2. Run docker compose
-
-
-`sudo docker compose up -d` ( MacOS, Linux )
-
-
-or
-
-
-`docker-compose up -d` ( Windows )
-
-
-## 3. Run protokit
-
-
-go to Examina-Protokit repo from your terminal and run:
-
-
-`sudo docker compose up -d` ( MacOS, Linux )
-
-
-or
-
-
-`docker-compose up -d` ( Windows )
-
-##
-
-
-**The app will be running on `localhost:3000`**
+You have now successfully set up and started the Choz API project. If you encounter any issues or have questions, please refer to the project's documentation or seek support from the development team. Happy coding!
+```
 
 
 
