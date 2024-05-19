@@ -17,13 +17,12 @@ First, create a Docker network for the Choz API project. Open your terminal and 
 
 ```sh
 sudo docker create network examina_network
-```
 
 ### 2. Install Libraries
 
 ```sh
 npm i
-```
+
 
 ### 3. Run Docker Compose
 
@@ -39,7 +38,7 @@ sudo docker compose up -d
 
 ```sh
 docker-compose up -d
-```
+
 
 ### 3. Run Protokit
 
@@ -47,27 +46,27 @@ To run the Protokit service, navigate to the `Examina-Protokit` repository in yo
 
 ```sh
 npm i
-```
+
 
 **For  Linux:**
 
 ```sh
 sudo docker compose up -d
-```
+
 
 **For Windows and MacOS:**
 
 ```sh
 docker-compose up -d
-```
+
 
 ## Access the Application
 
 Once the setup is complete, the API will be running and accessible at:
 
-```
+
 http://localhost:3005
-```
+
 
 
 ## Conclusion
