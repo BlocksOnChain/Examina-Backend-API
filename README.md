@@ -28,7 +28,6 @@ Next, run Docker Compose to set up the application containers. Depending on your
 
 **For macOS and Linux:**
 
-```sh
 sudo docker compose up -d
 
 
@@ -41,19 +40,16 @@ docker-compose up -d
 
 To run the Protokit service, navigate to the `Examina-Protokit` repository in your terminal and execute the following command:
 
-```sh
 npm i
 
 
 **For  Linux:**
 
-```sh
 sudo docker compose up -d
 
 
 **For Windows and MacOS:**
 
-```sh
 docker-compose up -d
 
 
@@ -73,9 +69,9 @@ You have now successfully set up and started the Choz API project. If you encoun
 
 
 
-## You can check the diagram for the API flow from here :
-https://drive.google.com/file/d/1PI3lqNI9EkaBnj8c4wtQMHXOVWOwuigK/view?usp=sharing
-
+## I suggest you to also check the medium blog on the Journey of a Quizz:
+[Inside Choz: A Quiz Journey](https://choz.medium.com/inside-choz-a-quiz-journey-afc2736f2703
+)
 
 # **EXAMINA** 🎓
 
