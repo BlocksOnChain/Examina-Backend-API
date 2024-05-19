@@ -6,7 +6,7 @@ services:
       dockerfile: Dockerfile
     ports:
       - 3005:3005
-    restart: unless-stopped
+    restart: always
     networks:
       - examina_network
     depends_on:
@@ -25,6 +25,7 @@ services:
       - mongodb_data:/data/db
     networks: 
       - examina_network
+
 volumes:
   mongodb_data: 
 

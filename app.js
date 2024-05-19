@@ -11,66 +11,71 @@ const MemoryStore = require("memorystore")(session);
 dotenv.config({ path: "./config/config.env" });
 
 const isTestEnv = require("./middleware/isTestEnv");
-
-connectDB();
-
-var store = isTestEnv
-	? new MemoryStore({
-		checkPeriod: 86400000, // prune expired entries every 24h
-	})
-	: new MongoDBStore({
-		uri: `${process.env.MONGO_URI}/connect_mongodb_session_test`,
-		collection: "mySessions",
-	});
-// Catch errors
-store.on("error", function (error) {
-	console.log(error);
-});
-
 const app = express();
+setTimeout(() => {
+try {
+	
+		console.log("MongoDB connection timeout.");
+	connectDB();
+	app.use(compression());
 
-app.use(compression());
+	app.use(express.static(path.join(__dirname, "public")));
 
-app.use(express.static(path.join(__dirname, "public")));
+	app.use(express.json());
+	app.use(express.urlencoded({ extended: true }));
+	var sess = {
+		secret: "examina the best",
+		cookie: { secure: false, maxAge: 1000 * 60 * 60 * 24 },
+		resave: false,
+		saveUninitialized: true,
+	};
+	var store = isTestEnv
+		? new MemoryStore({
+			checkPeriod: 86400000, // prune expired entries every 24h
+		})
+		: new MongoDBStore({
+			uri: `${process.env.MONGO_URI}/connect_mongodb_session_test`,
+			collection: "mySessions",
+		});
+	// Catch errors
+	store.on("error", function (error) {
+		console.log(error);
+	});
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-var sess = {
-	secret: "examina the best",
-	cookie: { secure: false, maxAge: 1000 * 60 * 60 * 24 },
-	resave: false,
-	saveUninitialized: true,
-};
+	sess.store = store;
 
-sess.store = store;
+	app.use(
+		cors({
+			origin: [
+				"http://localhost:3000",
+				"http://localhost:3001",
+				"https://www.choz.io",
+				"https://choz.io",
+				"https://choz.io/",
+				"https://www.choz.io/",
+			],
+			credentials: true,
+		})
+	);
+	app.set("trust proxy", 1); // trust first proxy;
 
-app.use(
-	cors({
-		origin: [
-			"http://localhost:3000",
-			"http://localhost:3001",
-			"https://www.choz.io",
-			"https://choz.io",
-			"https://choz.io/",
-			"https://www.choz.io/",
-		],
-		credentials: true,
-	})
-);
-app.set("trust proxy", 1); // trust first proxy;
+	// if (!isTestEnv) {
+	// 	sess.store = store;
+	// }
 
-// if (!isTestEnv) {
-// 	sess.store = store;
-// }
+	app.use(session(sess));
+	if (process.env.NODE_ENV === "development") {
+		app.use(morgan("dev"));
+	}
 
-app.use(session(sess));
-if (process.env.NODE_ENV === "development") {
-	app.use(morgan("dev"));
+	app.use("/exams", require("./routes/exams"));
+	app.use("/register", require("./routes/register"));
+	app.use("/user", require("./routes/user"));
+	app.use("/questions", require("./routes/questions"));
+} catch (error) {
+	throw new Error("Logged Error in app.js", error);
 }
+}, 5000);
 
-app.use("/exams", require("./routes/exams"));
-app.use("/register", require("./routes/register"));
-app.use("/user", require("./routes/user"));
-app.use("/questions", require("./routes/questions"));
 
 module.exports = app;
