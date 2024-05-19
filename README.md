@@ -15,12 +15,10 @@ Ensure you have the following installed on your system:
 
 First, create a Docker network for the Choz API project. Open your terminal and execute the following command:
 
-```sh
 sudo docker create network examina_network
 
 ### 2. Install Libraries
 
-```sh
 npm i
 
 
@@ -32,11 +30,10 @@ Next, run Docker Compose to set up the application containers. Depending on your
 
 ```sh
 sudo docker compose up -d
-```
+
 
 **For Windows:**
 
-```sh
 docker-compose up -d
 
 
