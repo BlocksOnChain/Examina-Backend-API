@@ -2,13 +2,16 @@ const mongoose = require("mongoose");
 
 const connectDB = async () => {
 	try {
+		setTimeout(() => {
+			console.log("MongoDB connection timeout.");
+		},3000);
 		await mongoose.connect(process.env.MONGO_URI, {});
 
 		const db = mongoose.connection.db;
 
 		if (!db) {
 			console.error("Failed to get MongoDB database.");
-			return;
+			throw new Error("Failed to get MongoDB database.");
 		}
 
 		console.log(
@@ -31,7 +34,7 @@ const connectDB = async () => {
 			}
 		}
 	} catch (error) {
-		console.error(error);
+		console.error("Error happened in db.js", error);
 		process.exit(1);
 	}
 };
