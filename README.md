@@ -73,23 +73,23 @@ You have now successfully set up and started the Choz API project. If you encoun
 [Inside Choz: A Quiz Journey](https://choz.medium.com/inside-choz-a-quiz-journey-afc2736f2703
 )
 
-# **EXAMINA** 🎓
+# **Choz** 🎓
 
 ## **Self-Verify Your Academic Success**  🛡️
 
 
 ### Introduction 🌟
 
-**EXAMINA** is an innovative educational platform built on the **Mina Protocol**, leveraging Zero-Knowledge proofs to revolutionize how students and educational institutions interact with examination results. Designed to preserve the integrity of academic evaluations, EXAMINA enables students to independently verify the authenticity of their test submissions, ensuring privacy and control over their academic records. This platform not only empowers students but also offers educational institutions a transparent, secure, and streamlined evaluation process, enhancing trust and efficiency across the board.
+**Choz** is an innovative educational platform built on the **Mina Protocol**, leveraging Zero-Knowledge proofs to revolutionize how students and educational institutions interact with examination results. Designed to preserve the integrity of academic evaluations, Choz enables students to independently verify the authenticity of their test submissions, ensuring privacy and control over their academic records. This platform not only empowers students but also offers educational institutions a transparent, secure, and streamlined evaluation process, enhancing trust and efficiency across the board.
 
 ### What is Problem? 🤔
 
-In the realm of education, the integrity of exam evaluations is paramount. Traditional systems often fall short, plagued by inaccuracies and the potential for manipulation, undermining both student achievement and institutional credibility. This is where EXAMINA steps in.
+In the realm of education, the integrity of exam evaluations is paramount. Traditional systems often fall short, plagued by inaccuracies and the potential for manipulation, undermining both student achievement and institutional credibility. This is where Choz steps in.
 
 # How We Built 📜
 ![Workflow](https://cdn.discordapp.com/attachments/1093078800943829053/1212838359928410132/image.png?ex=65f34abe&is=65e0d5be&hm=a6fdba0c27f051606c14c146979e3cb241aa5d05883562744920a1ea808809b2&)
 
-The EXAMINA smart contract is designed to facilitate a secure and transparent examination process on the blockchain. Leveraging Zero-Knowledge proofs and blockchain technology, this contract allows for the creation of exams, submission of answers by users, publication of correct answers, and anonymous score calculation.
+The Choz smart contract is designed to facilitate a secure and transparent examination process on the blockchain. Leveraging Zero-Knowledge proofs and blockchain technology, this contract allows for the creation of exams, submission of answers by users, publication of correct answers, and anonymous score calculation.
 
 ## Features 🔍
 
@@ -175,18 +175,18 @@ When deploying the contract, the following parameters are set:
 
 ## Conclusion 🎉
 
-By integrating cutting-edge blockchain and Zero-Knowledge proof technologies, the EXAMINA smart contract offers a novel solution to ensure the integrity, transparency, and fairness of online examinations. Join us in redefining the future of education.
+By integrating cutting-edge blockchain and Zero-Knowledge proof technologies, the Choz smart contract offers a novel solution to ensure the integrity, transparency, and fairness of online examinations. Join us in redefining the future of education.
 
 ## Upcoming Features 🚀🚀🚀
 
 ### Account Abstraction 🎨
 
-We are introducing Account Abstraction to simplify the user experience significantly. This feature will allow users to interact with our platform without needing to manage complex cryptographic keys directly. By abstracting away the technical complexities, we aim to make EXAMINA more accessible and user-friendly, enabling students and educators alike to focus on the core educational experience without worrying about the underlying blockchain technology.
+We are introducing Account Abstraction to simplify the user experience significantly. This feature will allow users to interact with our platform without needing to manage complex cryptographic keys directly. By abstracting away the technical complexities, we aim to make Choz more accessible and user-friendly, enabling students and educators alike to focus on the core educational experience without worrying about the underlying blockchain technology.
 
 ### NFT Rewards for Exam Completion 🏅
 
-EXAMINA will soon reward students with unique NFTs upon exam completion, gamifying learning and recognizing academic achievements. These digital badges highlight accomplishments and offer potential benefits within the EXAMINA ecosystem. This initiative underscores our dedication to using blockchain for a more secure, transparent, and engaging education platform.
+Choz will soon reward students with unique NFTs upon exam completion, gamifying learning and recognizing academic achievements. These digital badges highlight accomplishments and offer potential benefits within the Choz ecosystem. This initiative underscores our dedication to using blockchain for a more secure, transparent, and engaging education platform.
 
 ### Form Integration 📋
  
-We are set to introduce a dynamic form feature designed to streamline the process of exam creation, submission, and feedback collection. This feature will allow educators to easily construct exams with a variety of question types, collect submissions from students, and even gather feedback on the examination process, all within the EXAMINA platform. After this milestone we will change our product name to “**Choz**”.
+We are set to introduce a dynamic form feature designed to streamline the process of exam creation, submission, and feedback collection. This feature will allow educators to easily construct exams with a variety of question types, collect submissions from students, and even gather feedback on the examination process, all within the Choz platform. After this milestone we will change our product name to “**Choz**”.
