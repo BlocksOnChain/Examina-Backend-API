@@ -8,6 +8,7 @@ Welcome to the Choz API project! This guide will assist you in setting up the ap
 Ensure you have the following installed on your system:
 - Docker
 - Docker Compose
+- Node
 
 ## Steps to Start
 
